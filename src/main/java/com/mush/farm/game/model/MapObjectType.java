@@ -5,6 +5,7 @@
  */
 package com.mush.farm.game.model;
 
+import static com.mush.farm.game.model.BodyType.POTATO;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,8 @@ public enum MapObjectType {
 
     public static final Map<MapObjectType, MapObjectType> decayMap;
     public static final Map<MapObjectType, MapObjectType> evolveMap;
-    public static final Map<MapObjectType, MapObjectType> spreadMap;
+    public static final Map<MapObjectType, MapObjectType> spreadOnEvolveMap;
+    public static final Map<MapObjectType, BodyType> spawnOnEvolveMap;
     public static final Map<MapObjectType, Double> decayRateMap;
     public static final Map<MapObjectType, Double> evolveAgeMap;
     public static final Map<MapObjectType, double[]> waterDecayParamsMap;
@@ -38,7 +40,8 @@ public enum MapObjectType {
 
         evolveMap = new HashMap<>();
         evolveAgeMap = new HashMap<>();
-        spreadMap = new HashMap<>();
+        spreadOnEvolveMap = new HashMap<>();
+        spawnOnEvolveMap = new HashMap<>();
         waterDecayParamsMap = new HashMap<>();
 
         setDecay(POTATO_PLANTED, ORGANIC_RUBBLE, 10.0);
@@ -51,6 +54,7 @@ public enum MapObjectType {
 
         setEvolve(POTATO_PLANTED, POTATO_SAPLING, 15.0);
         setEvolve(POTATO_SAPLING, POTATO_PLANT, 15.0);
+        setEvolveAndSpawn(POTATO_PLANT, ORGANIC_RUBBLE, POTATO, 15.0);
         setEvolveAndSpread(GRASS, GRASS, GRASS, 10);
 
         setWaterDecayMultiplayerParams(WATER, 0, 0, 0);
@@ -75,8 +79,12 @@ public enum MapObjectType {
     }
     
     public static MapObjectType spread(MapObjectType from) {
-        MapObjectType result = spreadMap.get(from);
+        MapObjectType result = spreadOnEvolveMap.get(from);
         return result;
+    }
+    
+    public static BodyType spawn(MapObjectType from) {
+        return spawnOnEvolveMap.get(from);
     }
 
     public static double getDecayRate(MapObjectType type) {
@@ -130,6 +138,12 @@ public enum MapObjectType {
     
     public static void setEvolveAndSpread(MapObjectType evolveFrom, MapObjectType evolveTo, MapObjectType spreadAs, double evolveAge) {
         setEvolve(evolveFrom, evolveTo, evolveAge);
-        spreadMap.put(evolveFrom, spreadAs);
+        spreadOnEvolveMap.put(evolveFrom, spreadAs);
     }
+
+    private static void setEvolveAndSpawn(MapObjectType evolveFrom, MapObjectType evolveTo, BodyType spawnOne, double evolveAge) {
+        setEvolve(evolveFrom, evolveTo, evolveAge);
+        spawnOnEvolveMap.put(evolveFrom, spawnOne);
+    }
+    
 }

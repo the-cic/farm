@@ -55,8 +55,9 @@ public class MapObject {
             if (integrity < 0) {
                 decay();
             } else if (age > maxAge) {
-                evolve();
                 spread(eventQueue);
+                spawn(eventQueue);
+                evolve();
             }
         }
     }
@@ -70,6 +71,13 @@ public class MapObject {
         MapObjectType spreadType = MapObjectType.spread(type);
         if (spreadType != null) {
             eventQueue.add(new GameEvent("spread", new Object[]{u, v, spreadType}));
+        }
+    }
+    
+    public void spawn(GameEventQueue eventQueue) {
+        BodyType bodyType = MapObjectType.spawn(type);
+        if (bodyType != null) {
+            eventQueue.add(new GameEvent("spawnOnTile", new Object[]{u, v, bodyType}));
         }
     }
 

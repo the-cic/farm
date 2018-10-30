@@ -5,6 +5,7 @@
  */
 package com.mush.farm.game;
 
+import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.Character;
@@ -44,8 +45,9 @@ public class Game implements GameEventListener {
 
     // todo: ugly, put all of this somewhere else
     private void setupBodies() {
-        for (int i = 0; i < 10; i++) {
-            gameMap.spawnBody(BodyType.POTATO, Math.random() * 25 * 16, Math.random() * 25 * 16);
+        for (int i = 0; i < 3; i++) {
+//            gameMap.spawnBody(Math.random() < 0.75 ? BodyType.POTATO : BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
+            gameMap.spawnBody(BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
         character = new Character(gameMap.spawnBody(BodyType.PERSON, 0, 0));
 //        Body aBody = gameMap.getBodies().remove(0);
@@ -68,14 +70,14 @@ public class Game implements GameEventListener {
         // todo: move this to game logic or something
 //        System.out.println(event.eventName);
         switch (event.eventName) {
+            case "pause":
+                paused = !paused;
+                break;
             case "setTile":
                 setTile((MapObjectType) event.eventPayload);
                 break;
             case "applyJoystick":
                 applyJoystick();
-                break;
-            case "spread":
-                spread((Object[]) event.eventPayload);
                 break;
             case "interact":
                 interact();
@@ -83,15 +85,18 @@ public class Game implements GameEventListener {
             case "drop":
                 drop();
                 break;
-            case "pause":
-                paused = !paused;
+            case "spread":
+                spread((Object[]) event.eventPayload);
+                break;
+            case "spawnOnTile":
+                spawnOnTile((Object[]) event.eventPayload);
                 break;
         }
     }
 
     private void setTile(MapObjectType type) {
-        int u = (int) ((character.body.position.x + GameRenderer.tileSize * 0.5) / GameRenderer.tileSize);
-        int v = (int) ((character.body.position.y + GameRenderer.tileSize * 0.5) / GameRenderer.tileSize);
+        int u = (int) ((character.body.position.x) / GameRenderer.TILE_SIZE);
+        int v = (int) ((character.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
         MapObject mapObject = gameMap.getMapObject(u, v);
 
@@ -164,7 +169,7 @@ public class Game implements GameEventListener {
                 }
             }
         }
-        if (nearest != null && shortest < GameRenderer.tileSize) {
+        if (nearest != null && shortest < GameRenderer.TILE_SIZE) {
             gameMap.getBodies().remove(nearest);
             character.addToInventory(nearest);
         }
@@ -176,6 +181,16 @@ public class Game implements GameEventListener {
             item.position.setLocation(character.body.position);
             gameMap.getBodies().add(item);
         }
+    }
+
+    private void spawnOnTile(Object[] params) {
+        //eventQueue.add(new GameEvent("spawnOnTile", new Object[]{u, v, bodyType}));
+        int u = (int) params[0];
+        int v = (int) params[1];
+        BodyType type = (BodyType) params[2];
+        int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
+        int y = v * GameRenderer.TILE_SIZE;
+        gameMap.spawnBody(type, x, y);
     }
 
 }

@@ -5,7 +5,7 @@
  */
 package com.mush.farm.view;
 
-import com.mush.farm.game.GameRenderer;
+import com.mush.farm.game.render.GameRenderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

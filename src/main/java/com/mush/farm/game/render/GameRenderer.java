@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mush.farm.game;
+package com.mush.farm.game.render;
 
+import com.mush.farm.game.Game;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.GameMap;
@@ -17,7 +18,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 
@@ -27,13 +31,15 @@ import javax.imageio.ImageIO;
  */
 public class GameRenderer {
 
+    public static final int TILE_SIZE = 16;
+    
     private Game game;
     private GameMap gameMap;
     private BufferedImage tilesImage = null;
     private BufferedImage spritesImage = null;
     private Map<MapObjectType, BufferedImage> tileMap;
     private Map<BodyType, BufferedImage> bodySpriteMap;
-    public static final int tileSize = 16;
+    private final BodyComparator bodyComparator;
 
     public GameRenderer(Game game) {
         this.game = game;
@@ -41,6 +47,7 @@ public class GameRenderer {
 
         tileMap = new HashMap<>();
         bodySpriteMap = new HashMap<>();
+        bodyComparator = new BodyComparator();
 
         try {
             tilesImage = ImageIO.read(new File("img/tiles.png"));
@@ -58,6 +65,7 @@ public class GameRenderer {
 
             bodySpriteMap.put(BodyType.PERSON, cutTile(spritesImage, 0, 0));
             bodySpriteMap.put(BodyType.POTATO, cutTile(spritesImage, 1, 0));
+            bodySpriteMap.put(BodyType.BUCKET, cutTile(spritesImage, 2, 0));
 
         } catch (IOException e) {
 
@@ -65,9 +73,9 @@ public class GameRenderer {
     }
 
     private BufferedImage cutTile(BufferedImage img, int u, int v) {
-        BufferedImage tile = new BufferedImage(tileSize, tileSize, img.getType());
+        BufferedImage tile = new BufferedImage(TILE_SIZE, TILE_SIZE, img.getType());
         Graphics2D g = tile.createGraphics();
-        g.drawImage(img, -u * tileSize, -v * tileSize, null);
+        g.drawImage(img, -u * TILE_SIZE, -v * TILE_SIZE, null);
         g.dispose();
         return tile;
     }
@@ -92,27 +100,37 @@ public class GameRenderer {
         }
 
         // todo: depth sorting
-        for (Body body : gameMap.getBodies()) {
+        List<Body> depthSortedBodies = depthSortBodies(gameMap.getBodies());
+
+        for (Body body : depthSortedBodies) {
             render(g, body);
         }
 
         g.setTransform(t);
     }
 
+    private List<Body> depthSortBodies(List<Body> original) {
+        List<Body> ordered = new ArrayList<>(original);
+
+        Collections.sort(ordered, bodyComparator);
+
+        return ordered;
+    }
+
     private void render(Graphics2D g, Body body) {
         if (!body.containedBodies.isEmpty()) {
             for (int i = body.containedBodies.size() - 1; i >= 0; i--) {
                 Body subBody = body.containedBodies.get(i);
-                g.drawImage(bodySpriteMap.get(subBody.type), (int) body.position.x + i % 2, (int) body.position.y - 9 - i * 3, null);
+                g.drawImage(bodySpriteMap.get(subBody.type), (int) body.position.x + i % 2 - TILE_SIZE / 2, (int) (body.position.y - TILE_SIZE * 0.75) - i * 3, null);
             }
         }
-        g.drawImage(bodySpriteMap.get(body.type), (int) body.position.x, (int) body.position.y, null);
+        g.drawImage(bodySpriteMap.get(body.type), (int) body.position.x - TILE_SIZE / 2, (int) body.position.y, null);
     }
 
     private void render(Graphics2D g, int u, int v, MapObject object, MapWater water) {
         BufferedImage tile = tileMap.get(object.type);
-        int x = u * tileSize;
-        int y = v * tileSize;
+        int x = u * TILE_SIZE;
+        int y = v * TILE_SIZE;
         if (tile != null) {
             g.drawImage(tile, x, y, null);
         }
@@ -120,21 +138,21 @@ public class GameRenderer {
         if (game.showStats) {
             /**/
             g.setColor(Color.BLUE);
-            int waterLenght = (int) (water.getValue() * (tileSize - 2));
+            int waterLenght = (int) (water.getValue() * (TILE_SIZE - 2));
             g.drawLine(x + 1, y + 3, x + 1 + waterLenght, y + 3);
 
             g.setColor(new Color(0, 0.2f, 1, 0.2f));
             if (water.getValue() > 0) {
 //                g.drawRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
-                g.fillRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
+                g.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
             }
             /**/
             g.setColor(Color.YELLOW);
-            int ageLength = (int) (object.getAgePercent() * (tileSize - 2));
+            int ageLength = (int) (object.getAgePercent() * (TILE_SIZE - 2));
             g.drawLine(x + 1, y + 1, x + 1 + ageLength, y + 1);
 
             g.setColor(Color.RED);
-            int healthLength = (int) (object.integrity * (tileSize - 2));
+            int healthLength = (int) (object.integrity * (TILE_SIZE - 2));
             g.drawLine(x + 1, y + 2, x + 1 + healthLength, y + 2);
         }
     }
