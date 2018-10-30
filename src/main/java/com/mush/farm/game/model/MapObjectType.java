@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public enum MapObjectType {
     DIRT,

@@ -7,7 +7,6 @@ package com.mush.farm.game;
 
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
-import com.mush.farm.game.model.Character;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.MapObject;
 import com.mush.farm.game.model.MapObjectType;
@@ -24,7 +23,7 @@ import javax.imageio.ImageIO;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class GameRenderer {
 

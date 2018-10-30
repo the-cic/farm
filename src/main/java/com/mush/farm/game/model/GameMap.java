@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class GameMap {
 

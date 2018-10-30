@@ -7,7 +7,7 @@ package com.mush.farm.game;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class GameControl {
 

@@ -10,7 +10,7 @@ import com.mush.farm.game.GameEventQueue;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class MapObject {
 

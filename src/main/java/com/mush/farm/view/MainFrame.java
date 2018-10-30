@@ -6,14 +6,12 @@
 package com.mush.farm.view;
 
 import com.mush.farm.game.Game;
-import com.mush.farm.game.GameKeyboardListener;
-import com.mush.farm.game.GameRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class MainFrame extends JFrame {
 
@@ -28,9 +26,7 @@ public class MainFrame extends JFrame {
 
     private void init() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-//        setLayout(null);
         setSize(25 * 16 * 2 + 20, 25 * 16 * 2 + 50);
-//        setResizable(false);
 
         ImageIcon img = new ImageIcon("./icon.png");
         setIconImage(img.getImage());

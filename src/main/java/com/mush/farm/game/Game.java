@@ -14,7 +14,7 @@ import com.mush.farm.game.model.MapObjectType;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class Game implements GameEventListener {
 

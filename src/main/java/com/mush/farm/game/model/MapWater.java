@@ -7,7 +7,7 @@ package com.mush.farm.game.model;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class MapWater {
 

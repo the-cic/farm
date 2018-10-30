@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class MainPanel extends JPanel {
 

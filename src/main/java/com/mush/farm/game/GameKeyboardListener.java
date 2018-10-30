@@ -11,7 +11,7 @@ import java.awt.event.KeyListener;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class GameKeyboardListener implements KeyListener {
 

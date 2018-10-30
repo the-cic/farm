@@ -9,7 +9,7 @@ import com.mush.farm.view.MainFrame;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class Main {
     

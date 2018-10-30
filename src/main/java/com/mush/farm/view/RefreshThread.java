@@ -10,7 +10,7 @@ import java.awt.Component;
 
 /**
  *
- * @author cic
+ * @author mush
  */
 public class RefreshThread implements Runnable {
 
