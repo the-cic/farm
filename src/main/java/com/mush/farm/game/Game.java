@@ -26,6 +26,7 @@ public class Game implements GameEventListener {
 
     public Character character;
     public boolean showStats;
+    private boolean paused = false;
 
     public Game() {
         control = new GameControl();
@@ -54,8 +55,8 @@ public class Game implements GameEventListener {
     public void update(double elapsedSeconds) {
         eventQueue.process();
 
-        character.update(elapsedSeconds);
-        gameMap.update(elapsedSeconds, eventQueue);
+        character.update(paused ? 0 : elapsedSeconds);
+        gameMap.update(paused ? 0 : elapsedSeconds, eventQueue);
     }
 
     public void applyJoystick() {
@@ -78,6 +79,12 @@ public class Game implements GameEventListener {
                 break;
             case "interact":
                 interact();
+                break;
+            case "drop":
+                drop();
+                break;
+            case "pause":
+                paused = !paused;
                 break;
         }
     }
@@ -160,6 +167,14 @@ public class Game implements GameEventListener {
         if (nearest != null && shortest < GameRenderer.tileSize) {
             gameMap.getBodies().remove(nearest);
             character.addToInventory(nearest);
+        }
+    }
+
+    private void drop() {
+        Body item = character.removeLastFromInventory();
+        if (item != null) {
+            item.position.setLocation(character.body.position);
+            gameMap.getBodies().add(item);
         }
     }
 

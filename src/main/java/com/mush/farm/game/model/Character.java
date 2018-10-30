@@ -18,10 +18,10 @@ public class Character {
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
-    
+
     private List<Body> inventory;
     private List<BodyType> inventoryTypes;
-    
+
 
     public Character(Body body) {
         movementSpeed = 50;
@@ -44,25 +44,32 @@ public class Character {
         body.position.x += velocity.x * elapsedSeconds * movementSpeed;
         body.position.y += velocity.y * elapsedSeconds * movementSpeed;
     }
-    
+
     public void addToInventory(Body item) {
         inventory.add(item);
         inventoryTypes.add(item.type);
         body.containedBodies.add(item);
     }
-    
+
     // I don't know I'm just winging it
     public Body removeFromInventory(int index) {
         Body item = inventory.remove(index);
         inventoryTypes.remove(index);
-        body.containedBodies.remove(item);
+        body.containedBodies.remove(index);
         return item;
     }
-    
+
+    public Body removeLastFromInventory() {
+        if (inventory.isEmpty()) {
+            return null;
+        }
+        return removeFromInventory(inventory.size() - 1);
+    }
+
     public List<Body> getInventory() {
         return inventory;
     }
-    
+
     public List<BodyType> getInventoryTypes() {
         return inventoryTypes;
     }

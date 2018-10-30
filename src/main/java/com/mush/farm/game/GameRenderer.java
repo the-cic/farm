@@ -102,10 +102,9 @@ public class GameRenderer {
 
     private void render(Graphics2D g, Body body) {
         if (!body.containedBodies.isEmpty()) {
-            int count = 0;
-            for (Body subBody : body.containedBodies) {
-                g.drawImage(bodySpriteMap.get(subBody.type), (int) body.position.x, (int) body.position.y - 9 - count * 3, null);
-                count++;
+            for (int i = body.containedBodies.size() - 1; i >= 0; i--) {
+                Body subBody = body.containedBodies.get(i);
+                g.drawImage(bodySpriteMap.get(subBody.type), (int) body.position.x + i % 2, (int) body.position.y - 9 - i * 3, null);
             }
         }
         g.drawImage(bodySpriteMap.get(body.type), (int) body.position.x, (int) body.position.y, null);

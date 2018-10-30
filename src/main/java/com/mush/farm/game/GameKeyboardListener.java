@@ -44,16 +44,22 @@ public class GameKeyboardListener implements KeyListener {
                 game.showStats = !game.showStats;
                 break;
             case KeyEvent.VK_1:
-                setTile(MapObjectType.DIRT);
+                event("setTile", MapObjectType.DIRT);
                 break;
             case KeyEvent.VK_2:
-                setTile(MapObjectType.WATER);
+                event("setTile", MapObjectType.WATER);
                 break;
             case KeyEvent.VK_3:
-                setTile(MapObjectType.POTATO_PLANTED);
+                event("setTile", MapObjectType.POTATO_PLANTED);
                 break;
             case KeyEvent.VK_E:
-                interact();
+                event("interact");
+                break;
+            case KeyEvent.VK_Q:
+                event("drop");
+                break;
+            case KeyEvent.VK_P:
+                event("pause");
                 break;
         }
 
@@ -86,12 +92,12 @@ public class GameKeyboardListener implements KeyListener {
         }
     }
 
-    private void setTile(MapObjectType type) {
-        game.eventQueue.add(new GameEvent("setTile", type));
+    private void event(String name, Object payload) {
+        game.eventQueue.add(new GameEvent(name, payload));
     }
-    
-    private void interact() {
-        game.eventQueue.add(new GameEvent("interact", null));
+
+    private void event(String name) {
+        game.eventQueue.add(new GameEvent(name));
     }
 
 }

@@ -16,7 +16,7 @@ public class RefreshThread implements Runnable {
 
     private Game game;
     private Component component;
-    
+
     private boolean running = true;
     private int targetFps = 30;
     private long targetMillis = 1000 / targetFps;
