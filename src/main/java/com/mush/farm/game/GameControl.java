@@ -34,6 +34,10 @@ public class GameControl {
     void togglePause() {
         game.togglePause();
     }
+    
+    void changeCharacter() {
+        game.changeCharacter();
+    }
 
     public void applyJoystick() {
         if (joystick.isModified()) {

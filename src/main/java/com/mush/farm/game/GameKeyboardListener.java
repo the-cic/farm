@@ -61,6 +61,9 @@ public class GameKeyboardListener implements KeyListener {
             case KeyEvent.VK_P:
                 control.togglePause();
                 break;
+            case KeyEvent.VK_R:
+                control.changeCharacter();
+                break;
         }
 
         control.applyJoystick();

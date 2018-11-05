@@ -8,9 +8,11 @@ package com.mush.farm.game;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
+import com.mush.farm.game.model.GameCharacters;
 import com.mush.farm.game.model.MovableCharacter;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.MapObjectType;
+import java.util.List;
 
 /**
  *
@@ -23,6 +25,7 @@ public class Game implements GameEventListener {
     public GameMap gameMap;
     public GameKeyboardListener keyboardListener;
     public GameEventQueue eventQueue;
+    public GameCharacters characters;
 
     private MovableCharacter playerCharacter;
     public boolean showStats;
@@ -32,6 +35,7 @@ public class Game implements GameEventListener {
         eventQueue = new GameEventQueue();
         control = new GameControl(this);
         gameMap = new GameMap();
+        characters = new GameCharacters(gameMap, eventQueue);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
 
@@ -47,18 +51,33 @@ public class Game implements GameEventListener {
         for (int i = 0; i < 3; i++) {
             gameMap.spawnBody(BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
-        playerCharacter = new MovableCharacter(gameMap.spawnBody(BodyType.PERSON, 0, 0), eventQueue);
+        
+        for (int i = 0; i < 3; i++) {
+            characters.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
+        }
+        
+        playerCharacter = characters.getCharacters().get(0);
     }
 
     public void update(double elapsedSeconds) {
         eventQueue.process();
+        
+        double seconds = paused ? 0 : elapsedSeconds;
 
-        playerCharacter.update(paused ? 0 : elapsedSeconds);
-        gameMap.update(paused ? 0 : elapsedSeconds, eventQueue);
+        characters.update(seconds);
+        gameMap.update(seconds, eventQueue);
     }
 
     public void togglePause() {
         paused = !paused;
+    }
+    
+    public void changeCharacter() {
+        List<MovableCharacter> all = characters.getCharacters();
+        int ind = all.indexOf(playerCharacter);
+        ind++;
+        playerCharacter.velocity.setLocation(0, 0);
+        playerCharacter = ind >= all.size() ? all.get(0) : all.get(ind);
     }
 
     public MovableCharacter getPlayer() {
