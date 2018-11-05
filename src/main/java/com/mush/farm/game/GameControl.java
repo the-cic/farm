@@ -5,68 +5,54 @@
  */
 package com.mush.farm.game;
 
+import com.mush.farm.game.model.MovableCharacter;
+
 /**
  *
  * @author mush
  */
 public class GameControl {
 
-    private int xJoystick = 0;
-    private int yJoystick = 0;
-    private boolean modified = false;
-    
-    public int getXJoystick() {
-        return xJoystick;
-    }
-    
-    public int getYJoystick() {
-        return yJoystick;
-    }
-    
-    public boolean isModified() {
-        boolean value = modified;
-        modified = false;
-        return value;
+    public static final String E_APPLY_JOYSTICK = "applyJoystick";
+
+    private final Game game;
+    public final GameControlJoystick joystick;
+
+    GameControl(Game game) {
+        this.game = game;
+        joystick = new GameControlJoystick();
     }
 
-    public void pushLeft() {
-        xJoystick = -1;
-        modified = true;
+    public void debugEvent(String name, Object payload) {
+        game.eventQueue.add(new GameEvent(name, payload));
     }
 
-    public void pushRight() {
-        xJoystick = 1;
-        modified = true;
+    void toggleShowStats() {
+        game.showStats = !game.showStats;
     }
 
-    public void pushUp() {
-        yJoystick = -1;
-        modified = true;
+    void togglePause() {
+        game.togglePause();
     }
 
-    public void pushDown() {
-        yJoystick = 1;
-        modified = true;
+    public void applyJoystick() {
+        if (joystick.isModified()) {
+            game.eventQueue.add(new GameEvent(GameControl.E_APPLY_JOYSTICK, null));
+        }
     }
 
-    public void releaseLeft() {
-        xJoystick = xJoystick == -1 ? 0 : xJoystick;
-        modified = true;
+    public void actionPlayerInteract() {
+        MovableCharacter player = game.getPlayer();
+        if (player != null) {
+            player.interact();
+        }
     }
 
-    public void releaseRight() {
-        xJoystick = xJoystick == 1 ? 0 : xJoystick;
-        modified = true;
-    }
-
-    public void releaseUp() {
-        yJoystick = yJoystick == -1 ? 0 : yJoystick;
-        modified = true;
-    }
-
-    public void releaseDown() {
-        yJoystick = yJoystick == 1 ? 0 : yJoystick;
-        modified = true;
+    public void actionPlayerDrop() {
+        MovableCharacter player = game.getPlayer();
+        if (player != null) {
+            player.drop();
+        }
     }
 
 }

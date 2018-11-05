@@ -8,9 +8,8 @@ package com.mush.farm.game;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
-import com.mush.farm.game.model.Character;
+import com.mush.farm.game.model.MovableCharacter;
 import com.mush.farm.game.model.GameMap;
-import com.mush.farm.game.model.MapObject;
 import com.mush.farm.game.model.MapObjectType;
 
 /**
@@ -25,20 +24,20 @@ public class Game implements GameEventListener {
     public GameKeyboardListener keyboardListener;
     public GameEventQueue eventQueue;
 
-    public Character character;
+    private MovableCharacter playerCharacter;
     public boolean showStats;
     private boolean paused = false;
 
     public Game() {
-        control = new GameControl();
+        eventQueue = new GameEventQueue();
+        control = new GameControl(this);
         gameMap = new GameMap();
         renderer = new GameRenderer(this);
-        keyboardListener = new GameKeyboardListener(this);
-        eventQueue = new GameEventQueue();
+        keyboardListener = new GameKeyboardListener(control);
 
         eventQueue.addListener(this);
 
-        showStats = true;
+        showStats = false;
 
         setupBodies();
     }
@@ -46,116 +45,60 @@ public class Game implements GameEventListener {
     // todo: ugly, put all of this somewhere else
     private void setupBodies() {
         for (int i = 0; i < 3; i++) {
-//            gameMap.spawnBody(Math.random() < 0.75 ? BodyType.POTATO : BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
             gameMap.spawnBody(BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
-        character = new Character(gameMap.spawnBody(BodyType.PERSON, 0, 0));
-//        Body aBody = gameMap.getBodies().remove(0);
-//        character.addToInventory(aBody);
+        playerCharacter = new MovableCharacter(gameMap.spawnBody(BodyType.PERSON, 0, 0), eventQueue);
     }
 
     public void update(double elapsedSeconds) {
         eventQueue.process();
 
-        character.update(paused ? 0 : elapsedSeconds);
+        playerCharacter.update(paused ? 0 : elapsedSeconds);
         gameMap.update(paused ? 0 : elapsedSeconds, eventQueue);
     }
 
-    public void applyJoystick() {
-        character.move(control.getXJoystick(), control.getYJoystick());
+    public void togglePause() {
+        paused = !paused;
+    }
+
+    public MovableCharacter getPlayer() {
+        return playerCharacter;
     }
 
     @Override
     public void onEvent(GameEvent event) {
         // todo: move this to game logic or something
-//        System.out.println(event.eventName);
         switch (event.eventName) {
-            case "pause":
-                paused = !paused;
-                break;
             case "setTile":
                 setTile((MapObjectType) event.eventPayload);
                 break;
-            case "applyJoystick":
-                applyJoystick();
+            case GameControl.E_APPLY_JOYSTICK:
+                onJoystick();
                 break;
-            case "interact":
-                interact();
+            case MovableCharacter.E_INTERACT:
+                onCharacterInteract(event);
                 break;
-            case "drop":
-                drop();
+            case MovableCharacter.E_DROP:
+                onCharacterDrop(event);
                 break;
-            case "spread":
-                spread((Object[]) event.eventPayload);
+            case GameMap.E_SPREAD:
+                gameMap.onSpread(event);
                 break;
-            case "spawnOnTile":
-                spawnOnTile((Object[]) event.eventPayload);
+            case GameMap.E_SPAWN_ON_TILE:
+                gameMap.onSpawnOnTile(event);
                 break;
         }
     }
 
-    private void setTile(MapObjectType type) {
-        int u = (int) ((character.body.position.x) / GameRenderer.TILE_SIZE);
-        int v = (int) ((character.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
-
-        MapObject mapObject = gameMap.getMapObject(u, v);
-
-        if (mapObject != null) {
-            mapObject.reset(type);
-        }
+    private void onJoystick() {
+        playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
-    private void spread(Object[] params) {
-        // new Object[]{u, v, spreadType}
-        int u = (int) params[0];
-        int v = (int) params[1];
-        MapObjectType type = (MapObjectType) params[2];
-        int du = 0;
-        int dv = 0;
-
-        if (Math.random() < 0.5) {
-            du = Math.random() < 0.5 ? - 1 : +1;
-        } else {
-            dv = Math.random() < 0.5 ? - 1 : +1;
-        }
-
-        if (spreadTo(u + du, v + dv, type)) {
+    private void onCharacterInteract(GameEvent event) {
+        MovableCharacter character = (MovableCharacter) event.eventPayload;
+        if (character == null) {
             return;
         }
-
-        du = -du;
-        dv = -dv;
-
-        if (spreadTo(u + du, v + dv, type)) {
-            return;
-        }
-
-        int du0 = du;
-        du = dv;
-        dv = du0;
-
-        if (spreadTo(u + du, v + dv, type)) {
-            return;
-        }
-
-        du = -du;
-        dv = -dv;
-
-        spreadTo(u + du, v + dv, type);
-    }
-
-    private boolean spreadTo(int u, int v, MapObjectType type) {
-        MapObject mapObject = gameMap.getMapObject(u, v);
-        if (mapObject != null) {
-            if (mapObject.type == MapObjectType.DIRT || mapObject.type == MapObjectType.ORGANIC_RUBBLE) {
-                mapObject.reset(type);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void interact() {
         double shortest = Double.POSITIVE_INFINITY;
         Body nearest = null;
         for (Body body : gameMap.getBodies()) {
@@ -175,7 +118,11 @@ public class Game implements GameEventListener {
         }
     }
 
-    private void drop() {
+    private void onCharacterDrop(GameEvent event) {
+        MovableCharacter character = (MovableCharacter) event.eventPayload;
+        if (character == null) {
+            return;
+        }
         Body item = character.removeLastFromInventory();
         if (item != null) {
             item.position.setLocation(character.body.position);
@@ -183,14 +130,11 @@ public class Game implements GameEventListener {
         }
     }
 
-    private void spawnOnTile(Object[] params) {
-        //eventQueue.add(new GameEvent("spawnOnTile", new Object[]{u, v, bodyType}));
-        int u = (int) params[0];
-        int v = (int) params[1];
-        BodyType type = (BodyType) params[2];
-        int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
-        int y = v * GameRenderer.TILE_SIZE;
-        gameMap.spawnBody(type, x, y);
+    private void setTile(MapObjectType type) {
+        int u = (int) ((playerCharacter.body.position.x) / GameRenderer.TILE_SIZE);
+        int v = (int) ((playerCharacter.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+
+        gameMap.setTile(u, v, type);
     }
 
 }

@@ -5,29 +5,36 @@
  */
 package com.mush.farm.game.model;
 
+import com.mush.farm.game.GameEvent;
+import com.mush.farm.game.GameEventQueue;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * MOB
+ * 
  * @author mush
  */
-public class Character {
+public class MovableCharacter {
+    
+    public static final String E_INTERACT = "interact";
+    public static final String E_DROP = "drop";
 
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
+    private final GameEventQueue eventQueue;
 
     private List<Body> inventory;
     private List<BodyType> inventoryTypes;
 
-
-    public Character(Body body) {
+    public MovableCharacter(Body body, GameEventQueue queue) {
         movementSpeed = 50;
         this.body = body;
         this.inventory = new ArrayList<>();
         this.inventoryTypes = new ArrayList<>();
+        this.eventQueue = queue;
     }
 
     public void move(int dx, int dy) {
@@ -44,6 +51,14 @@ public class Character {
         body.position.x += velocity.x * elapsedSeconds * movementSpeed;
         body.position.y += velocity.y * elapsedSeconds * movementSpeed;
     }
+    
+    public void interact() {
+        eventQueue.add(new GameEvent(E_INTERACT, this));
+    }
+    
+    public void drop() {
+        eventQueue.add(new GameEvent(E_DROP, this));
+    }
 
     public void addToInventory(Body item) {
         inventory.add(item);
@@ -52,6 +67,7 @@ public class Character {
     }
 
     // I don't know I'm just winging it
+    // Excellent comment, I have no idea what it's about
     public Body removeFromInventory(int index) {
         Body item = inventory.remove(index);
         inventoryTypes.remove(index);

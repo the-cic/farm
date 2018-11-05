@@ -10,6 +10,7 @@ package com.mush.farm.game;
  * @author mush
  */
 public class GameEvent {
+
     public final String eventName;
     public final Object eventPayload;
 

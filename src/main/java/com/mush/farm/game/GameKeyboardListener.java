@@ -15,10 +15,10 @@ import java.awt.event.KeyListener;
  */
 public class GameKeyboardListener implements KeyListener {
 
-    private Game game;
+    private final GameControl control;
 
-    public GameKeyboardListener(Game game) {
-        this.game = game;
+    public GameKeyboardListener(GameControl control) {
+        this.control = control;
     }
 
     @Override
@@ -29,75 +29,61 @@ public class GameKeyboardListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
-                game.control.pushLeft();
+                control.joystick.pushLeft();
                 break;
             case KeyEvent.VK_RIGHT:
-                game.control.pushRight();
+                control.joystick.pushRight();
                 break;
             case KeyEvent.VK_UP:
-                game.control.pushUp();
+                control.joystick.pushUp();
                 break;
             case KeyEvent.VK_DOWN:
-                game.control.pushDown();
+                control.joystick.pushDown();
                 break;
             case KeyEvent.VK_V:
-                game.showStats = !game.showStats;
+                control.toggleShowStats();
                 break;
             case KeyEvent.VK_1:
-                event("setTile", MapObjectType.DIRT);
+                control.debugEvent("setTile", MapObjectType.DIRT);
                 break;
             case KeyEvent.VK_2:
-                event("setTile", MapObjectType.WATER);
+                control.debugEvent("setTile", MapObjectType.WATER);
                 break;
             case KeyEvent.VK_3:
-                event("setTile", MapObjectType.POTATO_PLANTED);
+                control.debugEvent("setTile", MapObjectType.POTATO_PLANTED);
                 break;
             case KeyEvent.VK_E:
-                event("interact");
+                control.actionPlayerInteract();
                 break;
             case KeyEvent.VK_Q:
-                event("drop");
+                control.actionPlayerDrop();
                 break;
             case KeyEvent.VK_P:
-                event("pause");
+                control.togglePause();
                 break;
         }
 
-        applyJoystick();
+        control.applyJoystick();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
-                game.control.releaseLeft();
+                control.joystick.releaseLeft();
                 break;
             case KeyEvent.VK_RIGHT:
-                game.control.releaseRight();
+                control.joystick.releaseRight();
                 break;
             case KeyEvent.VK_UP:
-                game.control.releaseUp();
+                control.joystick.releaseUp();
                 break;
             case KeyEvent.VK_DOWN:
-                game.control.releaseDown();
+                control.joystick.releaseDown();
                 break;
         }
 
-        applyJoystick();
-    }
-
-    private void applyJoystick() {
-        if (game.control.isModified()) {
-            game.eventQueue.add(new GameEvent("applyJoystick", null));
-        }
-    }
-
-    private void event(String name, Object payload) {
-        game.eventQueue.add(new GameEvent(name, payload));
-    }
-
-    private void event(String name) {
-        game.eventQueue.add(new GameEvent(name));
+        control.applyJoystick();
     }
 
 }

@@ -5,7 +5,6 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.GameEvent;
 import com.mush.farm.game.GameEventQueue;
 
 /**
@@ -13,7 +12,7 @@ import com.mush.farm.game.GameEventQueue;
  * @author mush
  */
 public class MapObject {
-
+    
     public MapObjectType type;
 
     public double age; // 0 .. inf
@@ -70,14 +69,14 @@ public class MapObject {
     public void spread(GameEventQueue eventQueue) {
         MapObjectType spreadType = MapObjectType.spread(type);
         if (spreadType != null) {
-            eventQueue.add(new GameEvent("spread", new Object[]{u, v, spreadType}));
+            eventQueue.add(GameMap.createSpreadEvent(u, v, spreadType));
         }
     }
     
     public void spawn(GameEventQueue eventQueue) {
         BodyType bodyType = MapObjectType.spawn(type);
         if (bodyType != null) {
-            eventQueue.add(new GameEvent("spawnOnTile", new Object[]{u, v, bodyType}));
+            eventQueue.add(GameMap.createSpawnEvent(u, v, bodyType));
         }
     }
 

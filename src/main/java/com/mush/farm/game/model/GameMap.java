@@ -5,7 +5,9 @@
  */
 package com.mush.farm.game.model;
 
+import com.mush.farm.game.GameEvent;
 import com.mush.farm.game.GameEventQueue;
+import com.mush.farm.game.render.GameRenderer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,6 +21,9 @@ import java.util.Set;
  */
 public class GameMap {
 
+    public static final String E_SPREAD = "spread";
+    public static final String E_SPAWN_ON_TILE = "spawnOnTile";
+
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
     private List<Body> mapBodies;
@@ -28,6 +33,32 @@ public class GameMap {
 
     public GameMap() {
         createMap();
+    }
+
+    static GameEvent createSpreadEvent(int u, int v, MapObjectType spreadType) {
+        return new GameEvent(E_SPREAD, new Object[]{u, v, spreadType});
+    }
+
+    static GameEvent createSpawnEvent(int u, int v, BodyType bodyType) {
+        return new GameEvent(E_SPAWN_ON_TILE, new Object[]{u, v, bodyType});
+    }
+
+    public void onSpread(GameEvent event) {
+        Object[] params = (Object[]) event.eventPayload;
+        int u = (int) params[0];
+        int v = (int) params[1];
+        MapObjectType type = (MapObjectType) params[2];
+
+        spread(u, v, type);
+    }
+
+    public void onSpawnOnTile(GameEvent event) {
+        Object[] params = (Object[]) event.eventPayload;
+        int u = (int) params[0];
+        int v = (int) params[1];
+        BodyType type = (BodyType) params[2];
+
+        spawnOnTile(u, v, type);
     }
 
     private void createMap() {
@@ -50,17 +81,17 @@ public class GameMap {
         while (fillInMap() > 0) {
             // twiddle thumbs
         }
-        
+
         mapBodies = new ArrayList<>();
     }
-    
+
     public Body spawnBody(BodyType type, double x, double y) {
         Body body = new Body(type);
         body.position.setLocation(x, y);
         mapBodies.add(body);
         return body;
     }
-    
+
     // todo: maybe something more useful, like a bound box of bodies?
     public List<Body> getBodies() {
         return mapBodies;
@@ -165,6 +196,66 @@ public class GameMap {
         return null;
     }
 
+    public void setTile(int u, int v, MapObjectType type) {
+        MapObject mapObject = getMapObject(u, v);
+
+        if (mapObject != null) {
+            mapObject.reset(type);
+        }
+    }
+
+    private void spread(int u, int v, MapObjectType type) {
+        int du = 0;
+        int dv = 0;
+
+        if (Math.random() < 0.5) {
+            du = Math.random() < 0.5 ? - 1 : +1;
+        } else {
+            dv = Math.random() < 0.5 ? - 1 : +1;
+        }
+
+        if (spreadTo(u + du, v + dv, type)) {
+            return;
+        }
+
+        du = -du;
+        dv = -dv;
+
+        if (spreadTo(u + du, v + dv, type)) {
+            return;
+        }
+
+        int du0 = du;
+        du = dv;
+        dv = du0;
+
+        if (spreadTo(u + du, v + dv, type)) {
+            return;
+        }
+
+        du = -du;
+        dv = -dv;
+
+        spreadTo(u + du, v + dv, type);
+    }
+
+    private boolean spreadTo(int u, int v, MapObjectType type) {
+        MapObject mapObject = getMapObject(u, v);
+        if (mapObject != null) {
+            if (mapObject.type == MapObjectType.DIRT || mapObject.type == MapObjectType.ORGANIC_RUBBLE) {
+                mapObject.reset(type);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void spawnOnTile(int u, int v, BodyType type) {
+        int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
+        int y = v * GameRenderer.TILE_SIZE;
+        spawnBody(type, x, y);
+    }
+
     public void update(double elapsedSeconds, GameEventQueue eventQueue) {
         for (int i = 0; i < mapObjects.length; i++) {
             mapObjects[i].update(elapsedSeconds, waterMap[i], eventQueue);
@@ -185,9 +276,9 @@ public class GameMap {
         propagateTo(i - 1, j + 0, distance);
         propagateTo(i + 0, j + 1, distance);
         propagateTo(i + 0, j - 1, distance);
-        
+
         distance += 0.42;
-        
+
         propagateTo(i + 1, j - 1, distance);
         propagateTo(i - 1, j - 1, distance);
         propagateTo(i + 1, j + 1, distance);
