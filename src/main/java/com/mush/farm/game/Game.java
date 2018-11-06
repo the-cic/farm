@@ -127,7 +127,7 @@ public class Game implements GameEventListener {
     }
 
     public void onEvent(CharacterEvent.Interact event) {
-        MovableCharacter character = event.character;
+        MovableCharacter character = characters.getCharacter(event.characterId);
         if (character == null) {
             return;
         }
@@ -151,7 +151,7 @@ public class Game implements GameEventListener {
     }
 
     public void onEvent(CharacterEvent.Drop event) {
-        MovableCharacter character = event.character;
+        MovableCharacter character = characters.getCharacter(event.characterId);
         if (character == null) {
             return;
         }

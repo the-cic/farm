@@ -14,10 +14,10 @@ import com.mush.farm.game.model.MovableCharacter;
  */
 public abstract class CharacterEvent extends GameEvent {
     
-    public final MovableCharacter character;
+    public final int characterId;
     
     public CharacterEvent(MovableCharacter character) {
-        this.character = character;
+        this.characterId = character.characterId;
     }
     
     public static class Interact extends CharacterEvent {

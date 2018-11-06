@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class MovableCharacter {
     
+    public final int characterId;
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
@@ -26,9 +27,10 @@ public class MovableCharacter {
     private List<Body> inventory;
     private List<BodyType> inventoryTypes;
 
-    public MovableCharacter(Body body, GameEventQueue queue) {
-        movementSpeed = 50;
+    public MovableCharacter(int id, Body body, GameEventQueue queue) {
+        this.characterId = id;
         this.body = body;
+        this.movementSpeed = 50;
         this.inventory = new ArrayList<>();
         this.inventoryTypes = new ArrayList<>();
         this.eventQueue = queue;
