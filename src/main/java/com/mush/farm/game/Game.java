@@ -37,7 +37,7 @@ public class Game implements GameEventListener {
     public Game() {
         eventQueue = new GameEventQueue();
         control = new GameControl(this);
-        gameMap = new GameMap();
+        gameMap = new GameMap(eventQueue);
         characters = new GameCharacters(gameMap, eventQueue);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
@@ -69,7 +69,7 @@ public class Game implements GameEventListener {
         double seconds = paused ? 0 : elapsedSeconds;
 
         characters.update(seconds);
-        gameMap.update(seconds, eventQueue);
+        gameMap.update(seconds);
     }
 
     public void togglePause() {

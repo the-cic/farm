@@ -12,12 +12,14 @@ package com.mush.farm.game.model;
 public class MapWater {
 
     private double waterDistance;
+    private double nextWaterDistance;
     private double age;
-    private static final int maxDistance = 5;
+    private static final int maxDistance = 6;
     private static final double decreaseAge = 2.0;
 
     public MapWater() {
         waterDistance = maxDistance + 1;
+        nextWaterDistance = waterDistance;
     }
     
     public void update(double elapsedSeconds) {
@@ -27,7 +29,8 @@ public class MapWater {
         age += elapsedSeconds;
         //waterDistance += (age / decreaseAge);
         if (age > decreaseAge) {
-            waterDistance = Math.min(waterDistance + 1, maxDistance + 1);
+            nextWaterDistance = Math.min(waterDistance + 1, maxDistance + 1);
+//            nextWaterDistance = waterDistance;
             age = 0;
         }
     }
@@ -39,10 +42,14 @@ public class MapWater {
         return Math.min(3.0 / (waterDistance * 2 + 1), 1);
     }
 
-    public void setDistance(double distance) {
-        if (distance < waterDistance) {
-            waterDistance = distance;
+    public void setNextDistance(double distance) {
+        if (distance < nextWaterDistance) {
+            nextWaterDistance = distance;
         }
+    }
+    
+    public void applyNextDistance() {
+        waterDistance = nextWaterDistance;
     }
 
     public double getDistance() {

@@ -24,15 +24,49 @@ import java.util.Set;
  */
 public class GameMap implements GameEventListener {
 
+    public final int mapWidth = 25;
+    public final int mapHeight = 25;
+    private final double maxElapsedSeconds = 1;
+
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
     private List<Body> mapBodies;
+    private double totalElapsedSeconds = 0;
+    private final GameEventQueue eventQueue;
 
-    public final int mapWidth = 25;
-    public final int mapHeight = 25;
-
-    public GameMap() {
+    public GameMap(GameEventQueue eventQueue) {
+        this.eventQueue = eventQueue;
         createMap();
+    }
+
+    public void update(double elapsedSeconds) {
+        totalElapsedSeconds += elapsedSeconds;
+        
+        if (totalElapsedSeconds < maxElapsedSeconds) {
+            return;
+        }
+        
+        update();
+        totalElapsedSeconds = 0;
+    }
+    
+    private void update() {
+        for (int i = 0; i < mapObjects.length; i++) {
+            mapObjects[i].update(totalElapsedSeconds, waterMap[i], eventQueue);
+        }
+        for (MapWater water : waterMap) {
+            water.update(totalElapsedSeconds);
+            water.applyNextDistance();
+        }
+        for (int i = 0; i < mapWidth; i++) {
+            for (int j = 0; j < mapHeight; j++) {
+                MapWater water = getWaterObject(i, j);
+                propagate(water, i, j);
+            }
+        }
+        for (MapWater water : waterMap) {
+            water.applyNextDistance();
+        }
     }
 
     @Override
@@ -243,19 +277,6 @@ public class GameMap implements GameEventListener {
         spawnBody(type, x, y);
     }
 
-    public void update(double elapsedSeconds, GameEventQueue eventQueue) {
-        for (int i = 0; i < mapObjects.length; i++) {
-            mapObjects[i].update(elapsedSeconds, waterMap[i], eventQueue);
-        }
-        for (int i = 0; i < mapWidth; i++) {
-            for (int j = 0; j < mapHeight; j++) {
-                MapWater water = getWaterObject(i, j);
-                water.update(elapsedSeconds);
-                propagate(water, i, j);
-            }
-        }
-    }
-
     private void propagate(MapWater water, int i, int j) {
         double distance = water.getDistance() + 1;
 
@@ -275,7 +296,7 @@ public class GameMap implements GameEventListener {
     private void propagateTo(int i, int j, double distance) {
         MapWater water = getWaterObject(i, j);
         if (water != null) {
-            water.setDistance(distance);
+            water.setNextDistance(distance);
         }
     }
 
