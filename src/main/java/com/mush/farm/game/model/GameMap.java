@@ -6,6 +6,7 @@
 package com.mush.farm.game.model;
 
 import com.mush.farm.game.GameEvent;
+import com.mush.farm.game.GameEventHandleHelper;
 import com.mush.farm.game.GameEventListener;
 import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.MapEvent;
@@ -36,13 +37,7 @@ public class GameMap implements GameEventListener {
 
     @Override
     public void onEvent(GameEvent event) {
-        if (event instanceof MapEvent) {
-            if (event instanceof MapEvent.Spread) {
-                onEvent((MapEvent.Spread) event);
-            } else if (event instanceof MapEvent.SpawnOnTile) {
-                onEvent((MapEvent.SpawnOnTile) event);
-            }
-        }
+        GameEventHandleHelper.handle(event, this);
     }
 
     public void onEvent(MapEvent.Spread event) {

@@ -117,8 +117,8 @@ public class Game implements GameEventListener {
                     setTile((MapObjectType) genericGameEvent.eventPayload);
                     break;
             }
-        } else if (event instanceof CharacterEvent) {
-            onCharacterEvent((CharacterEvent) event);
+        } else {
+            GameEventHandleHelper.handle(event, this);
         }
     }
 
@@ -126,15 +126,7 @@ public class Game implements GameEventListener {
         playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
-    private void onCharacterEvent(CharacterEvent event) {
-        if (event instanceof CharacterEvent.Interact) {
-            onCharacterEvent((CharacterEvent.Interact) event);
-        } else if (event instanceof CharacterEvent.Drop) {
-            onCharacterEvent((CharacterEvent.Drop) event);
-        }
-    }
-
-    private void onCharacterEvent(CharacterEvent.Interact event) {
+    public void onEvent(CharacterEvent.Interact event) {
         MovableCharacter character = event.character;
         if (character == null) {
             return;
@@ -158,7 +150,7 @@ public class Game implements GameEventListener {
         }
     }
 
-    private void onCharacterEvent(CharacterEvent.Drop event) {
+    public void onEvent(CharacterEvent.Drop event) {
         MovableCharacter character = event.character;
         if (character == null) {
             return;
