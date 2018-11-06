@@ -5,6 +5,8 @@
  */
 package com.mush.farm.game;
 
+import com.mush.farm.game.events.ControlEvent;
+import com.mush.farm.game.events.GenericGameEvent;
 import com.mush.farm.game.model.MovableCharacter;
 
 /**
@@ -12,8 +14,6 @@ import com.mush.farm.game.model.MovableCharacter;
  * @author mush
  */
 public class GameControl {
-
-    public static final String E_APPLY_JOYSTICK = "applyJoystick";
 
     private final Game game;
     public final GameControlJoystick joystick;
@@ -24,24 +24,24 @@ public class GameControl {
     }
 
     public void debugEvent(String name, Object payload) {
-        game.eventQueue.add(new GameEvent(name, payload));
+        game.eventQueue.add(new GenericGameEvent(name, payload));
     }
 
     void toggleShowStats() {
-        game.showStats = !game.showStats;
+        game.eventQueue.add(new ControlEvent(ControlEvent.Action.TOGGLE_STATS));
     }
 
     void togglePause() {
-        game.togglePause();
+        game.eventQueue.add(new ControlEvent(ControlEvent.Action.PAUSE));
     }
-    
+
     void changeCharacter() {
-        game.changeCharacter();
+        game.eventQueue.add(new ControlEvent(ControlEvent.Action.CHANGE_CHARACTER));
     }
 
     public void applyJoystick() {
         if (joystick.isModified()) {
-            game.eventQueue.add(new GameEvent(GameControl.E_APPLY_JOYSTICK, null));
+            game.eventQueue.add(new ControlEvent(ControlEvent.Action.APPLY_JOYSTICK));
         }
     }
 

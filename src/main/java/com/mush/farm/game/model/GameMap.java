@@ -6,7 +6,9 @@
 package com.mush.farm.game.model;
 
 import com.mush.farm.game.GameEvent;
+import com.mush.farm.game.GameEventListener;
 import com.mush.farm.game.GameEventQueue;
+import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,10 +21,7 @@ import java.util.Set;
  *
  * @author mush
  */
-public class GameMap {
-
-    public static final String E_SPREAD = "spread";
-    public static final String E_SPAWN_ON_TILE = "spawnOnTile";
+public class GameMap implements GameEventListener {
 
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
@@ -35,30 +34,23 @@ public class GameMap {
         createMap();
     }
 
-    static GameEvent createSpreadEvent(int u, int v, MapObjectType spreadType) {
-        return new GameEvent(E_SPREAD, new Object[]{u, v, spreadType});
+    @Override
+    public void onEvent(GameEvent event) {
+        if (event instanceof MapEvent) {
+            if (event instanceof MapEvent.Spread) {
+                onEvent((MapEvent.Spread) event);
+            } else if (event instanceof MapEvent.SpawnOnTile) {
+                onEvent((MapEvent.SpawnOnTile) event);
+            }
+        }
     }
 
-    static GameEvent createSpawnEvent(int u, int v, BodyType bodyType) {
-        return new GameEvent(E_SPAWN_ON_TILE, new Object[]{u, v, bodyType});
+    public void onEvent(MapEvent.Spread event) {
+        spread(event.u, event.v, event.type);
     }
 
-    public void onSpread(GameEvent event) {
-        Object[] params = (Object[]) event.eventPayload;
-        int u = (int) params[0];
-        int v = (int) params[1];
-        MapObjectType type = (MapObjectType) params[2];
-
-        spread(u, v, type);
-    }
-
-    public void onSpawnOnTile(GameEvent event) {
-        Object[] params = (Object[]) event.eventPayload;
-        int u = (int) params[0];
-        int v = (int) params[1];
-        BodyType type = (BodyType) params[2];
-
-        spawnOnTile(u, v, type);
+    public void onEvent(MapEvent.SpawnOnTile event) {
+        spawnOnTile(event.u, event.v, event.type);
     }
 
     private void createMap() {

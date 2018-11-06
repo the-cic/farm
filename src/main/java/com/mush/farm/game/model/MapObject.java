@@ -6,6 +6,7 @@
 package com.mush.farm.game.model;
 
 import com.mush.farm.game.GameEventQueue;
+import com.mush.farm.game.events.MapEvent;
 
 /**
  *
@@ -69,14 +70,14 @@ public class MapObject {
     public void spread(GameEventQueue eventQueue) {
         MapObjectType spreadType = MapObjectType.spread(type);
         if (spreadType != null) {
-            eventQueue.add(GameMap.createSpreadEvent(u, v, spreadType));
+            eventQueue.add(new MapEvent.Spread(u, v, spreadType));
         }
     }
     
     public void spawn(GameEventQueue eventQueue) {
         BodyType bodyType = MapObjectType.spawn(type);
         if (bodyType != null) {
-            eventQueue.add(GameMap.createSpawnEvent(u, v, bodyType));
+            eventQueue.add(new MapEvent.SpawnOnTile(u, v, bodyType));
         }
     }
 

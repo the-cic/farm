@@ -135,7 +135,7 @@ public class GameRenderer {
             g.drawImage(tile, x, y, null);
         }
 
-        if (game.showStats) {
+        if (game.getShowStats()) {
             /**/
             g.setColor(Color.BLUE);
             int waterLenght = (int) (water.getValue() * (TILE_SIZE - 2));

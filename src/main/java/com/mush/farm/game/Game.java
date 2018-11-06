@@ -5,6 +5,9 @@
  */
 package com.mush.farm.game;
 
+import com.mush.farm.game.events.CharacterEvent;
+import com.mush.farm.game.events.ControlEvent;
+import com.mush.farm.game.events.GenericGameEvent;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
@@ -28,7 +31,7 @@ public class Game implements GameEventListener {
     public GameCharacters characters;
 
     private MovableCharacter playerCharacter;
-    public boolean showStats;
+    private boolean showStats;
     private boolean paused = false;
 
     public Game() {
@@ -40,6 +43,7 @@ public class Game implements GameEventListener {
         keyboardListener = new GameKeyboardListener(control);
 
         eventQueue.addListener(this);
+        eventQueue.addListener(gameMap);
 
         showStats = false;
 
@@ -51,17 +55,17 @@ public class Game implements GameEventListener {
         for (int i = 0; i < 3; i++) {
             gameMap.spawnBody(BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
-        
+
         for (int i = 0; i < 3; i++) {
             characters.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
         }
-        
+
         playerCharacter = characters.getCharacters().get(0);
     }
 
     public void update(double elapsedSeconds) {
         eventQueue.process();
-        
+
         double seconds = paused ? 0 : elapsedSeconds;
 
         characters.update(seconds);
@@ -71,7 +75,7 @@ public class Game implements GameEventListener {
     public void togglePause() {
         paused = !paused;
     }
-    
+
     public void changeCharacter() {
         List<MovableCharacter> all = characters.getCharacters();
         int ind = all.indexOf(playerCharacter);
@@ -84,28 +88,37 @@ public class Game implements GameEventListener {
         return playerCharacter;
     }
 
+    public boolean getShowStats() {
+        return showStats;
+    }
+
     @Override
     public void onEvent(GameEvent event) {
         // todo: move this to game logic or something
-        switch (event.eventName) {
-            case "setTile":
-                setTile((MapObjectType) event.eventPayload);
-                break;
-            case GameControl.E_APPLY_JOYSTICK:
-                onJoystick();
-                break;
-            case MovableCharacter.E_INTERACT:
-                onCharacterInteract(event);
-                break;
-            case MovableCharacter.E_DROP:
-                onCharacterDrop(event);
-                break;
-            case GameMap.E_SPREAD:
-                gameMap.onSpread(event);
-                break;
-            case GameMap.E_SPAWN_ON_TILE:
-                gameMap.onSpawnOnTile(event);
-                break;
+        if (event instanceof ControlEvent) {
+            switch (((ControlEvent) event).action) {
+                case APPLY_JOYSTICK:
+                    onJoystick();
+                    break;
+                case PAUSE:
+                    paused = !paused;
+                    break;
+                case TOGGLE_STATS:
+                    showStats = !showStats;
+                    break;
+                case CHANGE_CHARACTER:
+                    changeCharacter();
+                    break;
+            }
+        } else if (event instanceof GenericGameEvent) {
+            GenericGameEvent genericGameEvent = (GenericGameEvent) event;
+            switch (genericGameEvent.eventName) {
+                case "setTile":
+                    setTile((MapObjectType) genericGameEvent.eventPayload);
+                    break;
+            }
+        } else if (event instanceof CharacterEvent) {
+            onCharacterEvent((CharacterEvent) event);
         }
     }
 
@@ -113,8 +126,16 @@ public class Game implements GameEventListener {
         playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
-    private void onCharacterInteract(GameEvent event) {
-        MovableCharacter character = (MovableCharacter) event.eventPayload;
+    private void onCharacterEvent(CharacterEvent event) {
+        if (event instanceof CharacterEvent.Interact) {
+            onCharacterEvent((CharacterEvent.Interact) event);
+        } else if (event instanceof CharacterEvent.Drop) {
+            onCharacterEvent((CharacterEvent.Drop) event);
+        }
+    }
+
+    private void onCharacterEvent(CharacterEvent.Interact event) {
+        MovableCharacter character = event.character;
         if (character == null) {
             return;
         }
@@ -137,8 +158,8 @@ public class Game implements GameEventListener {
         }
     }
 
-    private void onCharacterDrop(GameEvent event) {
-        MovableCharacter character = (MovableCharacter) event.eventPayload;
+    private void onCharacterEvent(CharacterEvent.Drop event) {
+        MovableCharacter character = event.character;
         if (character == null) {
             return;
         }

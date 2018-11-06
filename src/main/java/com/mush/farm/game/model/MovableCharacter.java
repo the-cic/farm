@@ -5,8 +5,8 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.GameEvent;
 import com.mush.farm.game.GameEventQueue;
+import com.mush.farm.game.events.CharacterEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +18,6 @@ import java.util.List;
  */
 public class MovableCharacter {
     
-    public static final String E_INTERACT = "interact";
-    public static final String E_DROP = "drop";
-
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
@@ -53,11 +50,11 @@ public class MovableCharacter {
     }
     
     public void interact() {
-        eventQueue.add(new GameEvent(E_INTERACT, this));
+        eventQueue.add(new CharacterEvent.Interact(this));
     }
     
     public void drop() {
-        eventQueue.add(new GameEvent(E_DROP, this));
+        eventQueue.add(new CharacterEvent.Drop(this));
     }
 
     public void addToInventory(Body item) {
@@ -68,6 +65,7 @@ public class MovableCharacter {
 
     // I don't know I'm just winging it
     // Excellent comment, I have no idea what it's about
+    // Every time I come here I have less idea what this is about
     public Body removeFromInventory(int index) {
         Body item = inventory.remove(index);
         inventoryTypes.remove(index);

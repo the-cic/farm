@@ -6,20 +6,11 @@
 package com.mush.farm.game;
 
 /**
- *
+ * Main superclass of game events
+ * Does very little
+ * 
  * @author mush
  */
 public class GameEvent {
 
-    public final String eventName;
-    public final Object eventPayload;
-
-    public GameEvent(String name) {
-        this(name, null);
-    }
-
-    public GameEvent(String name, Object payload) {
-        this.eventName = name;
-        this.eventPayload = payload;
-    }
 }
