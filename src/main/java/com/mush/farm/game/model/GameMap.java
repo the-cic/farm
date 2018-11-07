@@ -5,9 +5,6 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.GameEvent;
-import com.mush.farm.game.GameEventHandleHelper;
-import com.mush.farm.game.GameEventListener;
 import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
@@ -22,7 +19,7 @@ import java.util.Set;
  *
  * @author mush
  */
-public class GameMap implements GameEventListener {
+public class GameMap {
 
     public final int mapWidth = 25;
     public final int mapHeight = 25;
@@ -67,11 +64,6 @@ public class GameMap implements GameEventListener {
         for (MapWater water : waterMap) {
             water.applyNextDistance();
         }
-    }
-
-    @Override
-    public void onEvent(GameEvent event) {
-        GameEventHandleHelper.handle(event, this);
     }
 
     public void onEvent(MapEvent.Spread event) {

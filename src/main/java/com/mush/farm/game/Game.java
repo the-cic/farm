@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author mush
  */
-public class Game implements GameEventListener {
+public class Game {
 
     public GameControl control;
     public GameRenderer renderer;
@@ -92,38 +92,29 @@ public class Game implements GameEventListener {
         return showStats;
     }
 
-    @Override
-    public void onEvent(GameEvent event) {
-        // todo: move this to game logic or something
-        if (event instanceof ControlEvent) {
-            switch (((ControlEvent) event).action) {
-                case APPLY_JOYSTICK:
-                    onJoystick();
-                    break;
-                case PAUSE:
-                    paused = !paused;
-                    break;
-                case TOGGLE_STATS:
-                    showStats = !showStats;
-                    break;
-                case CHANGE_CHARACTER:
-                    changeCharacter();
-                    break;
-            }
-        } else if (event instanceof GenericGameEvent) {
-            GenericGameEvent genericGameEvent = (GenericGameEvent) event;
-            switch (genericGameEvent.eventName) {
-                case "setTile":
-                    setTile((MapObjectType) genericGameEvent.eventPayload);
-                    break;
-            }
-        } else {
-            GameEventHandleHelper.handle(event, this);
+    public void onEvent(ControlEvent event) {
+        switch (event.action) {
+            case APPLY_JOYSTICK:
+                onJoystick();
+                break;
+            case PAUSE:
+                paused = !paused;
+                break;
+            case TOGGLE_STATS:
+                showStats = !showStats;
+                break;
+            case CHANGE_CHARACTER:
+                changeCharacter();
+                break;
         }
     }
 
-    private void onJoystick() {
-        playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
+    public void onEvent(GenericGameEvent event) {
+        switch (event.eventName) {
+            case "setTile":
+                setTile((MapObjectType) event.eventPayload);
+                break;
+        }
     }
 
     public void onEvent(CharacterEvent.Interact event) {
@@ -160,6 +151,10 @@ public class Game implements GameEventListener {
             item.position.setLocation(character.body.position);
             gameMap.getBodies().add(item);
         }
+    }
+
+    private void onJoystick() {
+        playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
     private void setTile(MapObjectType type) {

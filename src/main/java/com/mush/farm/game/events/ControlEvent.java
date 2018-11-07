@@ -26,10 +26,4 @@ public class ControlEvent extends GameEvent {
         this.action = action;
     }
     
-//    public static class Pause {}
-//    
-//    public static class ToggleStats {}
-//    
-//    public static WTF AM I EVEN DOING??
-    
 }
