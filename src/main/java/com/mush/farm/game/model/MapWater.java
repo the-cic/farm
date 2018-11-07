@@ -11,49 +11,54 @@ package com.mush.farm.game.model;
  */
 public class MapWater {
 
-    private double waterDistance;
-    private double nextWaterDistance;
     private double age;
-    private static final int maxDistance = 6;
-    private static final double decreaseAge = 2.0;
+    private static final double drainAge = 2.0;
 
-    public MapWater() {
-        waterDistance = maxDistance + 1;
-        nextWaterDistance = waterDistance;
-    }
+    private double value = 0;
+    public static final int MAX_STEPS_FROM_SOURCE = 5;
+    private double stepsFromSource = MAX_STEPS_FROM_SOURCE;
+    private double nextStepsFromSource = MAX_STEPS_FROM_SOURCE;
     
+    public MapWater() {
+    }
+
     public void update(double elapsedSeconds) {
-        if (waterDistance > maxDistance) {
+        if (stepsFromSource < MAX_STEPS_FROM_SOURCE) {
+            double factor = (MAX_STEPS_FROM_SOURCE - stepsFromSource) / MAX_STEPS_FROM_SOURCE;
+            value = 0.5 + 0.5 * factor;
+            age = 0;
+            return;
+        }
+        if (value <= 0) {
+            value = 0;
             return;
         }
         age += elapsedSeconds;
-        //waterDistance += (age / decreaseAge);
-        if (age > decreaseAge) {
-            nextWaterDistance = Math.min(waterDistance + 1, maxDistance + 1);
-//            nextWaterDistance = waterDistance;
+        if (age > drainAge) {
+            value = 0;
             age = 0;
         }
     }
 
     public double getValue() {
-        if (waterDistance > maxDistance) {
-            return 0;
-        }
-        return Math.min(3.0 / (waterDistance * 2 + 1), 1);
+        return value;
     }
 
-    public void setNextDistance(double distance) {
-        if (distance < nextWaterDistance) {
-            nextWaterDistance = distance;
+    public void setStepsFromSource(double steps) {
+        if (steps < nextStepsFromSource) {
+            nextStepsFromSource = steps;
         }
     }
-    
-    public void applyNextDistance() {
-        waterDistance = nextWaterDistance;
+
+    public void applyStepsFromSource() {
+        stepsFromSource = nextStepsFromSource;
+        nextStepsFromSource = MAX_STEPS_FROM_SOURCE;
     }
 
-    public double getDistance() {
-        return waterDistance;
+    public double getStepsFromSource() {
+        return stepsFromSource < MAX_STEPS_FROM_SOURCE
+                ? stepsFromSource
+                : MAX_STEPS_FROM_SOURCE;
     }
 
 }

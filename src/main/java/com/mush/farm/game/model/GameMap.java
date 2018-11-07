@@ -23,7 +23,7 @@ public class GameMap {
 
     public final int mapWidth = 25;
     public final int mapHeight = 25;
-    private final double maxElapsedSeconds = 1;
+    private final double maxElapsedSeconds = 0.1;
 
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
@@ -38,22 +38,18 @@ public class GameMap {
 
     public void update(double elapsedSeconds) {
         totalElapsedSeconds += elapsedSeconds;
-        
+
         if (totalElapsedSeconds < maxElapsedSeconds) {
             return;
         }
-        
+
         update();
         totalElapsedSeconds = 0;
     }
-    
+
     private void update() {
         for (int i = 0; i < mapObjects.length; i++) {
             mapObjects[i].update(totalElapsedSeconds, waterMap[i], eventQueue);
-        }
-        for (MapWater water : waterMap) {
-            water.update(totalElapsedSeconds);
-            water.applyNextDistance();
         }
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
@@ -62,7 +58,8 @@ public class GameMap {
             }
         }
         for (MapWater water : waterMap) {
-            water.applyNextDistance();
+            water.applyStepsFromSource();
+            water.update(totalElapsedSeconds);
         }
     }
 
@@ -270,25 +267,29 @@ public class GameMap {
     }
 
     private void propagate(MapWater water, int i, int j) {
-        double distance = water.getDistance() + 1;
+        double stepsFromSource = water.getStepsFromSource();
 
-        propagateTo(i + 1, j + 0, distance);
-        propagateTo(i - 1, j + 0, distance);
-        propagateTo(i + 0, j + 1, distance);
-        propagateTo(i + 0, j - 1, distance);
+        if (stepsFromSource < 5) {
+            stepsFromSource += 1;
 
-        distance += 0.42;
+            propagateStepsTo(i + 1, j + 0, stepsFromSource);
+            propagateStepsTo(i - 1, j + 0, stepsFromSource);
+            propagateStepsTo(i + 0, j + 1, stepsFromSource);
+            propagateStepsTo(i + 0, j - 1, stepsFromSource);
 
-        propagateTo(i + 1, j - 1, distance);
-        propagateTo(i - 1, j - 1, distance);
-        propagateTo(i + 1, j + 1, distance);
-        propagateTo(i - 1, j + 1, distance);
+            stepsFromSource += 0.42;
+
+            propagateStepsTo(i + 1, j - 1, stepsFromSource);
+            propagateStepsTo(i - 1, j - 1, stepsFromSource);
+            propagateStepsTo(i + 1, j + 1, stepsFromSource);
+            propagateStepsTo(i - 1, j + 1, stepsFromSource);
+        }
     }
 
-    private void propagateTo(int i, int j, double distance) {
+    private void propagateStepsTo(int i, int j, double steps) {
         MapWater water = getWaterObject(i, j);
         if (water != null) {
-            water.setNextDistance(distance);
+            water.setStepsFromSource(steps);
         }
     }
 

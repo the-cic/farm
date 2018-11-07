@@ -45,7 +45,7 @@ public class MapObject {
         age += time;
 
         if (type == MapObjectType.WATER) {
-            mapWater.setNextDistance(0);
+            mapWater.setStepsFromSource(0);
         } else {
             double decayRate = MapObjectType.getDecayRate(type);
             double waterMultiplier = MapObjectType.getWaterDecayMultiplier(type, mapWater.getValue());
