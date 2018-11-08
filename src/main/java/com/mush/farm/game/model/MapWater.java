@@ -18,7 +18,7 @@ public class MapWater {
     public static final int MAX_STEPS_FROM_SOURCE = 5;
     private double stepsFromSource = MAX_STEPS_FROM_SOURCE;
     private double nextStepsFromSource = MAX_STEPS_FROM_SOURCE;
-    
+
     public MapWater() {
     }
 
@@ -50,6 +50,14 @@ public class MapWater {
         }
     }
 
+    public void setStepsFromSourceAtSource() {
+        nextStepsFromSource = 0;
+    }
+    
+    public void setStepsFromSourceTooFar() {
+        nextStepsFromSource = MAX_STEPS_FROM_SOURCE;
+    }
+
     public void applyStepsFromSource() {
         stepsFromSource = nextStepsFromSource;
         nextStepsFromSource = MAX_STEPS_FROM_SOURCE;
@@ -59,6 +67,10 @@ public class MapWater {
         return stepsFromSource < MAX_STEPS_FROM_SOURCE
                 ? stepsFromSource
                 : MAX_STEPS_FROM_SOURCE;
+    }
+    
+    public boolean isWithinMaxStepsFromSource() {
+        return stepsFromSource < MAX_STEPS_FROM_SOURCE;
     }
 
 }

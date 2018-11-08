@@ -54,7 +54,14 @@ public class GameMap {
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 MapWater water = getWaterObject(i, j);
-                propagate(water, i, j);
+
+                if (water.isWithinMaxStepsFromSource()) {
+                    MapObjectType type = getMapObjectType(i, j);
+
+                    if (!MapObjectType.blocksWater(type)) {
+                        propagate(water, i, j);
+                    }
+                }
             }
         }
         for (MapWater water : waterMap) {
@@ -80,7 +87,7 @@ public class GameMap {
 
         for (int i = 0; i < size; i++) {
             mapObjects[i] = null;
-            waterMap[i] = new MapWater();
+            waterMap[i] = new MapWater(/*i % mapWidth, i / mapWidth*/);
         }
         MapObjectType[] values = MapObjectType.values();
         for (int i = 0; i < seeds; i++) {
@@ -269,21 +276,19 @@ public class GameMap {
     private void propagate(MapWater water, int i, int j) {
         double stepsFromSource = water.getStepsFromSource();
 
-        if (stepsFromSource < 5) {
-            stepsFromSource += 1;
+        stepsFromSource += 1;
 
-            propagateStepsTo(i + 1, j + 0, stepsFromSource);
-            propagateStepsTo(i - 1, j + 0, stepsFromSource);
-            propagateStepsTo(i + 0, j + 1, stepsFromSource);
-            propagateStepsTo(i + 0, j - 1, stepsFromSource);
+        propagateStepsTo(i + 1, j + 0, stepsFromSource);
+        propagateStepsTo(i - 1, j + 0, stepsFromSource);
+        propagateStepsTo(i + 0, j + 1, stepsFromSource);
+        propagateStepsTo(i + 0, j - 1, stepsFromSource);
 
-            stepsFromSource += 0.42;
+        stepsFromSource += 0.42;
 
-            propagateStepsTo(i + 1, j - 1, stepsFromSource);
-            propagateStepsTo(i - 1, j - 1, stepsFromSource);
-            propagateStepsTo(i + 1, j + 1, stepsFromSource);
-            propagateStepsTo(i - 1, j + 1, stepsFromSource);
-        }
+        propagateStepsTo(i + 1, j - 1, stepsFromSource);
+        propagateStepsTo(i - 1, j - 1, stepsFromSource);
+        propagateStepsTo(i + 1, j + 1, stepsFromSource);
+        propagateStepsTo(i - 1, j + 1, stepsFromSource);
     }
 
     private void propagateStepsTo(int i, int j, double steps) {

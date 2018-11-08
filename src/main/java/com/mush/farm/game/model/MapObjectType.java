@@ -33,6 +33,7 @@ public enum MapObjectType {
     public static final Map<MapObjectType, Double> decayRateMap;
     public static final Map<MapObjectType, Double> evolveAgeMap;
     public static final Map<MapObjectType, double[]> waterDecayParamsMap;
+    public static final Map<MapObjectType, Boolean> waterBlockingMap;
 
     static {
         decayMap = new HashMap<>();
@@ -43,6 +44,7 @@ public enum MapObjectType {
         spreadOnEvolveMap = new HashMap<>();
         spawnOnEvolveMap = new HashMap<>();
         waterDecayParamsMap = new HashMap<>();
+        waterBlockingMap = new HashMap<>();
 
         setDecay(POTATO_PLANTED, ORGANIC_RUBBLE, 10.0);
         setDecay(POTATO_SAPLING, ORGANIC_RUBBLE, 20.0);
@@ -66,6 +68,8 @@ public enum MapObjectType {
         setWaterDecayMultiplayerParams(GRASS, 1, -1);
         
         setWaterDecayMultiplayerParams(STONE_WALL, 0, 1);
+        
+        setBlocksWater(STONE_WALL);
     }
 
     public static MapObjectType decay(MapObjectType from) {
@@ -90,6 +94,11 @@ public enum MapObjectType {
     public static double getDecayRate(MapObjectType type) {
         Double rate = decayRateMap.get(type);
         return rate != null ? rate : 0;
+    }
+    
+    public static boolean blocksWater(MapObjectType type) {
+        Boolean blocks = waterBlockingMap.get(type);
+        return Boolean.TRUE.equals(blocks);
     }
 
     public static double getWaterDecayMultiplier(MapObjectType type, double water) {
@@ -144,6 +153,10 @@ public enum MapObjectType {
     private static void setEvolveAndSpawn(MapObjectType evolveFrom, MapObjectType evolveTo, BodyType spawnOne, double evolveAge) {
         setEvolve(evolveFrom, evolveTo, evolveAge);
         spawnOnEvolveMap.put(evolveFrom, spawnOne);
+    }
+    
+    private static void setBlocksWater(MapObjectType type) {
+        waterBlockingMap.put(type, true);
     }
     
 }

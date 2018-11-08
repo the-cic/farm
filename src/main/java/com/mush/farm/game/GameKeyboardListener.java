@@ -52,6 +52,9 @@ public class GameKeyboardListener implements KeyListener {
             case KeyEvent.VK_3:
                 control.debugEvent("setTile", MapObjectType.POTATO_PLANTED);
                 break;
+            case KeyEvent.VK_4:
+                control.debugEvent("setTile", MapObjectType.STONE_WALL);
+                break;
             case KeyEvent.VK_E:
                 control.actionPlayerInteract();
                 break;
