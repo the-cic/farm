@@ -64,9 +64,11 @@ public class GameEventQueue {
             }
 
         } catch (SecurityException
-                | IllegalAccessException | IllegalArgumentException
+                | IllegalAccessException
+                | IllegalArgumentException
                 | InvocationTargetException ex) {
-            //
+            
+            ex.printStackTrace(System.out);
         }
     }
 

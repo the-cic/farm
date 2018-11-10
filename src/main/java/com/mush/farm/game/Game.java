@@ -8,6 +8,7 @@ package com.mush.farm.game;
 import com.mush.farm.game.events.CharacterEvent;
 import com.mush.farm.game.events.ControlEvent;
 import com.mush.farm.game.events.GenericGameEvent;
+import com.mush.farm.game.events.InteractionEvent;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
@@ -15,6 +16,7 @@ import com.mush.farm.game.model.GameCharacters;
 import com.mush.farm.game.model.MovableCharacter;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.GameMapGenerator;
+import com.mush.farm.game.model.MapObject;
 import com.mush.farm.game.model.MapObjectType;
 import java.util.List;
 
@@ -137,9 +139,23 @@ public class Game {
                 }
             }
         }
+
+        Body tool = character.getEquipped();
+
         if (nearest != null && shortest < GameRenderer.TILE_SIZE) {
-            gameMap.getBodies().remove(nearest);
-            character.addToInventory(nearest);
+            if (tool != null) {
+                eventQueue.add(new InteractionEvent.BodyOnBody(character, tool, nearest));
+            } else {
+                gameMap.getBodies().remove(nearest);
+                character.addToInventory(nearest);
+            }
+        }
+        if (tool != null) {
+            int u = (int) ((playerCharacter.body.position.x) / GameRenderer.TILE_SIZE);
+            int v = (int) ((playerCharacter.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+
+            MapObject mapObject = gameMap.getMapObject(u, v);
+            eventQueue.add(new InteractionEvent.BodyOnMapObject(character, tool, mapObject));
         }
     }
 
@@ -151,8 +167,30 @@ public class Game {
         Body item = character.removeLastFromInventory();
         if (item != null) {
             item.position.setLocation(character.body.position);
+            // just a tiny bit in front of the character
+            item.position.y += 1;
             gameMap.getBodies().add(item);
         }
+    }
+
+    public void onEvent(CharacterEvent.Equip event) {
+        MovableCharacter character = characters.getCharacter(event.characterId);
+        if (character == null) {
+            return;
+        }
+        character.equipFirst();
+    }
+
+    public void onEvent(InteractionEvent.BodyOnBody event) {
+        System.out.println("interaction by c.id:" + event.character.characterId
+                + " with tool.type:" + event.tool.type
+                + " on target.type:" + event.target.type);
+    }
+
+    public void onEvent(InteractionEvent.BodyOnMapObject event) {
+        System.out.println("interaction by c.id:" + event.character.characterId
+                + " with tool.type:" + event.tool.type
+                + " on target.type:" + event.target.type);
     }
 
     private void onJoystick() {

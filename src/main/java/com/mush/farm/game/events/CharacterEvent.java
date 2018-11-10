@@ -34,4 +34,11 @@ public abstract class CharacterEvent extends GameEvent {
         }
     }
     
+    public static class Equip extends CharacterEvent {
+
+        public Equip(MovableCharacter character) {
+            super(character);
+        }
+    }
+    
 }

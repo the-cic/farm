@@ -33,7 +33,7 @@ public class GameRenderer {
 
     public static final int TILE_SIZE = 16;
     public static final int TILE_ZOOM = 2;
-    
+
     private Game game;
     private GameMap gameMap;
     private BufferedImage tilesImage = null;
@@ -123,10 +123,27 @@ public class GameRenderer {
         if (!body.containedBodies.isEmpty()) {
             for (int i = body.containedBodies.size() - 1; i >= 0; i--) {
                 Body subBody = body.containedBodies.get(i);
-                g.drawImage(bodySpriteMap.get(subBody.type), (int) body.position.x + i % 2 - TILE_SIZE / 2, (int) (body.position.y - TILE_SIZE * 0.75) - i * 3, null);
+                g.drawImage(bodySpriteMap.get(subBody.type),
+                        (int) body.position.x + i % 2 - TILE_SIZE / 2,
+                        (int) (body.position.y - TILE_SIZE * 0.75) - i * 3,
+                        null);
             }
         }
-        g.drawImage(bodySpriteMap.get(body.type), (int) body.position.x - TILE_SIZE / 2, (int) body.position.y, null);
+
+        g.drawImage(bodySpriteMap.get(body.type),
+                (int) body.position.x - TILE_SIZE / 2,
+                (int) body.position.y,
+                null);
+
+        if (body.character != null) {
+            Body equippedBody = body.character.getEquipped();
+            if (equippedBody != null) {
+                g.drawImage(bodySpriteMap.get(equippedBody.type),
+                        (int) body.position.x,
+                        (int) body.position.y - TILE_SIZE / 10,
+                        null);
+            }
+        }
     }
 
     private void render(Graphics2D g, int u, int v, MapObject object, MapWater water) {

@@ -8,32 +8,29 @@ package com.mush.farm.game.model;
 import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.CharacterEvent;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * MOB
- * 
+ *
  * @author mush
  */
 public class MovableCharacter {
-    
+
     public final int characterId;
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
     private final GameEventQueue eventQueue;
 
-    private List<Body> inventory;
-    private List<BodyType> inventoryTypes;
+    private Body equippedBody;
 
     public MovableCharacter(int id, Body body, GameEventQueue queue) {
         this.characterId = id;
         this.body = body;
         this.movementSpeed = 50;
-        this.inventory = new ArrayList<>();
-        this.inventoryTypes = new ArrayList<>();
         this.eventQueue = queue;
+        this.body.character = this;
     }
 
     public void move(int dx, int dy) {
@@ -50,44 +47,66 @@ public class MovableCharacter {
         body.position.x += velocity.x * elapsedSeconds * movementSpeed;
         body.position.y += velocity.y * elapsedSeconds * movementSpeed;
     }
-    
+
     public void interact() {
         eventQueue.add(new CharacterEvent.Interact(this));
     }
-    
+
     public void drop() {
         eventQueue.add(new CharacterEvent.Drop(this));
     }
 
-    public void addToInventory(Body item) {
-        inventory.add(item);
-        inventoryTypes.add(item.type);
-        body.containedBodies.add(item);
+    public void equip() {
+        eventQueue.add(new CharacterEvent.Equip(this));
     }
 
-    // I don't know I'm just winging it
-    // Excellent comment, I have no idea what it's about
-    // Every time I come here I have less idea what this is about
-    public Body removeFromInventory(int index) {
-        Body item = inventory.remove(index);
-        inventoryTypes.remove(index);
-        body.containedBodies.remove(index);
+    public void equipFirst() {
+        Body inventoryItem = removeFromInventory(0);
+        Body equippedItem = unEquip();
+        if (equippedItem != null) {
+            addToInventory(equippedItem);
+        }
+        if (inventoryItem != null) {
+            equip(inventoryItem);
+        }
+    }
+
+    public void equip(Body item) {
+        equippedBody = item;
+    }
+
+    public Body unEquip() {
+        Body item = equippedBody;
+        equippedBody = null;
         return item;
     }
 
-    public Body removeLastFromInventory() {
-        if (inventory.isEmpty()) {
+    public Body getEquipped() {
+        return equippedBody;
+    }
+
+    public void addToInventory(Body item) {
+        body.containedBodies.add(item);
+    }
+
+    public Body removeFromInventory(int index) {
+        try {
+            Body item = body.containedBodies.remove(index);
+            return item;
+        } catch (IndexOutOfBoundsException ex) {
             return null;
         }
-        return removeFromInventory(inventory.size() - 1);
+    }
+
+    public Body removeLastFromInventory() {
+        if (body.containedBodies.isEmpty()) {
+            return null;
+        }
+        return removeFromInventory(body.containedBodies.size() - 1);
     }
 
     public List<Body> getInventory() {
-        return inventory;
-    }
-
-    public List<BodyType> getInventoryTypes() {
-        return inventoryTypes;
+        return body.containedBodies;
     }
 
 }

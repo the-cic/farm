@@ -59,4 +59,11 @@ public class GameControl {
         }
     }
 
+    public void actionPlayerEquip() {
+        MovableCharacter player = game.getPlayer();
+        if (player != null) {
+            player.equip();
+        }
+    }
+
 }

@@ -17,11 +17,17 @@ public class Body {
 
     public final Point2D.Double position = new Point2D.Double(0, 0);
     public BodyType type;
+    public MovableCharacter character;
     public List<Body> containedBodies;
 
     public Body(BodyType type) {
         this.type = type;
         this.containedBodies = new ArrayList<>();
     }
-    
+
+    public Body(BodyType type, MovableCharacter character) {
+        this(type);
+        this.character = character;
+    }
+
 }
