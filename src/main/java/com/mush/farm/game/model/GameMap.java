@@ -23,7 +23,7 @@ public class GameMap {
 
     public static final int MAP_WIDTH = 25;
     public static final int MAP_HEIGHT = 25;
-    private final double maxElapsedSeconds = 0.1;
+    private final double maxElapsedSeconds = 0.01;
 
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
@@ -259,7 +259,7 @@ public class GameMap {
     private boolean spreadTo(int u, int v, MapObjectType type) {
         MapObject mapObject = getMapObject(u, v);
         if (mapObject != null) {
-            if (mapObject.type == MapObjectType.DIRT || mapObject.type == MapObjectType.ORGANIC_RUBBLE) {
+            if (MapObjectType.canSpreadInto(type, mapObject.type)) {
                 mapObject.reset(type);
                 return true;
             }

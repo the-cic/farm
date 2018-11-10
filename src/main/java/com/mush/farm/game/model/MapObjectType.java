@@ -7,7 +7,9 @@ package com.mush.farm.game.model;
 
 import static com.mush.farm.game.model.BodyType.POTATO;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -15,6 +17,7 @@ import java.util.Map;
  */
 public enum MapObjectType {
     DIRT,
+    DIRT_HOLE,
     ORGANIC_RUBBLE,
     STONE_RUBBLE,
     GRASS,
@@ -29,6 +32,7 @@ public enum MapObjectType {
     public static final Map<MapObjectType, MapObjectType> decayMap;
     public static final Map<MapObjectType, MapObjectType> evolveMap;
     public static final Map<MapObjectType, MapObjectType> spreadOnEvolveMap;
+    public static final Map<MapObjectType, Set<MapObjectType>> canSpreadIntoMap;
     public static final Map<MapObjectType, BodyType> spawnOnEvolveMap;
     public static final Map<MapObjectType, Double> decayRateMap;
     public static final Map<MapObjectType, Double> evolveAgeMap;
@@ -42,6 +46,7 @@ public enum MapObjectType {
         evolveMap = new HashMap<>();
         evolveAgeMap = new HashMap<>();
         spreadOnEvolveMap = new HashMap<>();
+        canSpreadIntoMap = new HashMap<>();
         spawnOnEvolveMap = new HashMap<>();
         waterDecayParamsMap = new HashMap<>();
         waterBlockingMap = new HashMap<>();
@@ -58,8 +63,10 @@ public enum MapObjectType {
         setEvolve(POTATO_SAPLING, POTATO_PLANT, 15.0);
         setEvolveAndSpawn(POTATO_PLANT, ORGANIC_RUBBLE, POTATO, 15.0);
         setEvolveAndSpread(GRASS, GRASS, GRASS, 10);
-
-        setWaterDecayMultiplayerParams(WATER, 0, 0, 0);
+        setCanSpreadInto(GRASS, DIRT);
+        setCanSpreadInto(GRASS, ORGANIC_RUBBLE);
+        setEvolveAndSpread(WATER, WATER, WATER, 0.01);
+        setCanSpreadInto(WATER, DIRT_HOLE);
 
         setWaterDecayMultiplayerParams(POTATO_SAPLING, 1, -1);
         setWaterDecayMultiplayerParams(POTATO_PLANTED, 1, -1);
@@ -85,6 +92,14 @@ public enum MapObjectType {
     public static MapObjectType spread(MapObjectType from) {
         MapObjectType result = spreadOnEvolveMap.get(from);
         return result;
+    }
+    
+    public static boolean canSpreadInto(MapObjectType type, MapObjectType intoType) {
+        Set<MapObjectType> set = canSpreadIntoMap.get(type);
+        if (set.isEmpty()) {
+            return false;
+        }
+        return set.contains(intoType);
     }
     
     public static BodyType spawn(MapObjectType from) {
@@ -148,6 +163,15 @@ public enum MapObjectType {
     public static void setEvolveAndSpread(MapObjectType evolveFrom, MapObjectType evolveTo, MapObjectType spreadAs, double evolveAge) {
         setEvolve(evolveFrom, evolveTo, evolveAge);
         spreadOnEvolveMap.put(evolveFrom, spreadAs);
+    }
+    
+    public static void setCanSpreadInto(MapObjectType type, MapObjectType spreadInto) {
+        Set<MapObjectType> set = canSpreadIntoMap.get(type);
+        if (set == null) {
+            set = new HashSet<>();
+            canSpreadIntoMap.put(type, set);
+        }
+        set.add(spreadInto);
     }
 
     private static void setEvolveAndSpawn(MapObjectType evolveFrom, MapObjectType evolveTo, BodyType spawnOne, double evolveAge) {

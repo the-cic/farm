@@ -13,7 +13,7 @@ import com.mush.farm.game.events.MapEvent;
  * @author mush
  */
 public class MapObject {
-    
+
     public MapObjectType type;
 
     public double age; // 0 .. inf
@@ -46,19 +46,19 @@ public class MapObject {
 
         if (type == MapObjectType.WATER) {
             mapWater.setStepsFromSourceAtSource();
-        } else {
-            double decayRate = MapObjectType.getDecayRate(type);
-            double waterMultiplier = MapObjectType.getWaterDecayMultiplier(type, mapWater.getValue());
+        }
+        
+        double decayRate = MapObjectType.getDecayRate(type);
+        double waterMultiplier = MapObjectType.getWaterDecayMultiplier(type, mapWater.getValue());
 
-            integrity -= decayRate * waterMultiplier * time * decayRateMultiplier;
+        integrity -= decayRate * waterMultiplier * time * decayRateMultiplier;
 
-            if (integrity < 0) {
-                decay();
-            } else if (age > maxAge) {
-                spread(eventQueue);
-                spawn(eventQueue);
-                evolve();
-            }
+        if (integrity < 0) {
+            decay();
+        } else if (age > maxAge) {
+            spread(eventQueue);
+            spawn(eventQueue);
+            evolve();
         }
     }
 
@@ -73,7 +73,7 @@ public class MapObject {
             eventQueue.add(new MapEvent.Spread(u, v, spreadType));
         }
     }
-    
+
     public void spawn(GameEventQueue eventQueue) {
         BodyType bodyType = MapObjectType.spawn(type);
         if (bodyType != null) {

@@ -57,6 +57,7 @@ public class GameRenderer {
             cutTile(tilesImage, 0, 0, MapObjectType.DIRT);
             cutTile(tilesImage, 1, 0, MapObjectType.GRASS);
             cutTile(tilesImage, 2, 0, MapObjectType.WATER);
+            cutTile(tilesImage, 3, 0, MapObjectType.DIRT_HOLE);
             cutTile(tilesImage, 0, 1, MapObjectType.ORGANIC_RUBBLE);
             cutTile(tilesImage, 1, 1, MapObjectType.STONE_RUBBLE);
             cutTile(tilesImage, 2, 1, MapObjectType.STONE_WALL);
