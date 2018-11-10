@@ -21,8 +21,8 @@ import java.util.Set;
  */
 public class GameMap {
 
-    public final int mapWidth = 25;
-    public final int mapHeight = 25;
+    public static final int MAP_WIDTH = 25;
+    public static final int MAP_HEIGHT = 25;
     private final double maxElapsedSeconds = 0.1;
 
     private MapObject[] mapObjects;
@@ -51,8 +51,8 @@ public class GameMap {
         for (int i = 0; i < mapObjects.length; i++) {
             mapObjects[i].update(totalElapsedSeconds, waterMap[i], eventQueue);
         }
-        for (int i = 0; i < mapWidth; i++) {
-            for (int j = 0; j < mapHeight; j++) {
+        for (int i = 0; i < MAP_WIDTH; i++) {
+            for (int j = 0; j < MAP_HEIGHT; j++) {
                 MapWater water = getWaterObject(i, j);
 
                 if (water.isWithinMaxStepsFromSource()) {
@@ -79,7 +79,7 @@ public class GameMap {
     }
 
     private void createMap() {
-        int size = mapWidth * mapHeight;
+        int size = MAP_WIDTH * MAP_HEIGHT;
         int seeds = 100;
 
         mapObjects = new MapObject[size];
@@ -91,8 +91,8 @@ public class GameMap {
         }
         MapObjectType[] values = MapObjectType.values();
         for (int i = 0; i < seeds; i++) {
-            int u = (int) (mapWidth * Math.random());
-            int v = (int) (mapHeight * Math.random());
+            int u = (int) (MAP_WIDTH * Math.random());
+            int v = (int) (MAP_HEIGHT * Math.random());
             setMapObject(u, v, values[(int) (Math.random() * values.length)]);
         }
         while (fillInMap() > 0) {
@@ -130,8 +130,8 @@ public class GameMap {
     private int fillInMap() {
         int count = 0;
         List<FillInOperation> operations = new ArrayList<>();
-        for (int v = 0; v < mapHeight; v++) {
-            for (int u = 0; u < mapWidth; u++) {
+        for (int v = 0; v < MAP_HEIGHT; v++) {
+            for (int u = 0; u < MAP_WIDTH; u++) {
                 MapObjectType type = getMapObjectType(u, v);
                 if (type == null) {
                     type = fillInTile(u, v);
@@ -187,14 +187,14 @@ public class GameMap {
     }
 
     public MapObject getMapObject(int u, int v) {
-        if (u >= 0 && u < mapWidth && v >= 0 && v < mapHeight) {
-            return mapObjects[u + v * mapHeight];
+        if (u >= 0 && u < MAP_WIDTH && v >= 0 && v < MAP_HEIGHT) {
+            return mapObjects[u + v * MAP_HEIGHT];
         }
         return null;
     }
 
     public void setMapObject(int u, int v, MapObject object) {
-        mapObjects[u + v * mapHeight] = object;
+        mapObjects[u + v * MAP_HEIGHT] = object;
     }
 
     public MapObjectType getMapObjectType(int u, int v) {
@@ -207,8 +207,8 @@ public class GameMap {
     }
 
     public MapWater getWaterObject(int u, int v) {
-        if (u >= 0 && u < mapWidth && v >= 0 && v < mapHeight) {
-            return waterMap[u + v * mapHeight];
+        if (u >= 0 && u < MAP_WIDTH && v >= 0 && v < MAP_HEIGHT) {
+            return waterMap[u + v * MAP_HEIGHT];
         }
         return null;
     }

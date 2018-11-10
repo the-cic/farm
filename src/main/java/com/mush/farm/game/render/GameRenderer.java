@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 public class GameRenderer {
 
     public static final int TILE_SIZE = 16;
+    public static final int TILE_ZOOM = 2;
     
     private Game game;
     private GameMap gameMap;
@@ -87,7 +88,7 @@ public class GameRenderer {
 
     public void render(Graphics2D g) {
         AffineTransform t = g.getTransform();
-        g.scale(2, 2);
+        g.scale(TILE_ZOOM, TILE_ZOOM);
 
         for (int j = 0; j < 50; j++) {
             for (int i = 0; i < 50; i++) {

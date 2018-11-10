@@ -6,6 +6,9 @@
 package com.mush.farm.view;
 
 import com.mush.farm.game.Game;
+import com.mush.farm.game.model.GameMap;
+import com.mush.farm.game.render.GameRenderer;
+import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
@@ -26,7 +29,6 @@ public class MainFrame extends JFrame {
 
     private void init() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(25 * 16 * 2 + 20, 25 * 16 * 2 + 50);
 
         ImageIcon img = new ImageIcon("./icon.png");
         setIconImage(img.getImage());
@@ -36,8 +38,14 @@ public class MainFrame extends JFrame {
 
         panel = new MainPanel(game.renderer);
         panel.setVisible(true);
+        
+        int tileSize = GameRenderer.TILE_SIZE * GameRenderer.TILE_ZOOM;
+        
+        panel.setPreferredSize(new Dimension(GameMap.MAP_WIDTH * tileSize, GameMap.MAP_HEIGHT * tileSize));        
 
         add(panel);
+        
+        pack();
 
         refreshThread = new RefreshThread(game, panel);
         new Thread(refreshThread).start();
