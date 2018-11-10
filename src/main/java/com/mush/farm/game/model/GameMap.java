@@ -9,11 +9,7 @@ import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -23,7 +19,7 @@ public class GameMap {
 
     public static final int MAP_WIDTH = 25;
     public static final int MAP_HEIGHT = 25;
-    private final double maxElapsedSeconds = 0.01;
+    private final double maxElapsedSeconds = 0.5;
 
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
@@ -80,23 +76,13 @@ public class GameMap {
 
     private void createMap() {
         int size = MAP_WIDTH * MAP_HEIGHT;
-        int seeds = 100;
 
         mapObjects = new MapObject[size];
         waterMap = new MapWater[size];
 
         for (int i = 0; i < size; i++) {
             mapObjects[i] = null;
-            waterMap[i] = new MapWater(/*i % mapWidth, i / mapWidth*/);
-        }
-        MapObjectType[] values = MapObjectType.values();
-        for (int i = 0; i < seeds; i++) {
-            int u = (int) (MAP_WIDTH * Math.random());
-            int v = (int) (MAP_HEIGHT * Math.random());
-            setMapObject(u, v, values[(int) (Math.random() * values.length)]);
-        }
-        while (fillInMap() > 0) {
-            // twiddle thumbs
+            waterMap[i] = new MapWater();
         }
 
         mapBodies = new ArrayList<>();
@@ -112,78 +98,6 @@ public class GameMap {
     // todo: maybe something more useful, like a bound box of bodies?
     public List<Body> getBodies() {
         return mapBodies;
-    }
-
-    private class FillInOperation {
-
-        int u;
-        int v;
-        MapObjectType type;
-
-        private FillInOperation(int u, int v, MapObjectType type) {
-            this.u = u;
-            this.v = v;
-            this.type = type;
-        }
-    }
-
-    private int fillInMap() {
-        int count = 0;
-        List<FillInOperation> operations = new ArrayList<>();
-        for (int v = 0; v < MAP_HEIGHT; v++) {
-            for (int u = 0; u < MAP_WIDTH; u++) {
-                MapObjectType type = getMapObjectType(u, v);
-                if (type == null) {
-                    type = fillInTile(u, v);
-                    if (type != null) {
-                        operations.add(new FillInOperation(u, v, type));
-                        count++;
-                    }
-                }
-            }
-        }
-        for (FillInOperation operation : operations) {
-            setMapObject(operation.u, operation.v, operation.type);
-        }
-        return count;
-    }
-
-    private MapObjectType fillInTile(int u, int v) {
-        Map<MapObjectType, Integer> histogram = new HashMap<>();
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                MapObjectType tile = getMapObjectType(u + i, v + j);
-                if (tile != null) {
-                    if (histogram.containsKey(tile)) {
-                        histogram.put(tile, histogram.get(tile) + 1);
-                    } else {
-                        histogram.put(tile, 1);
-                    }
-                }
-            }
-        }
-        if (histogram.isEmpty()) {
-            return null;
-        }
-
-        Collection<Integer> values = histogram.values();
-        int total = 0;
-        for (int value : values) {
-            total += value;
-        }
-        int target = (int) (Math.random() * total);
-        int count = 0;
-        MapObjectType tile = null;
-        Set<MapObjectType> keys = histogram.keySet();
-        for (MapObjectType type : keys) {
-            count += histogram.get(type);
-            if (count >= target) {
-                tile = type;
-                break;
-            }
-        }
-
-        return tile;
     }
 
     public MapObject getMapObject(int u, int v) {

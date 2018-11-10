@@ -14,6 +14,7 @@ import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.GameCharacters;
 import com.mush.farm.game.model.MovableCharacter;
 import com.mush.farm.game.model.GameMap;
+import com.mush.farm.game.model.GameMapGenerator;
 import com.mush.farm.game.model.MapObjectType;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class Game {
 
         showStats = false;
 
+        new GameMapGenerator(gameMap).generate();
         setupBodies();
     }
 
