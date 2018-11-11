@@ -6,6 +6,7 @@
 package com.mush.farm.game.model;
 
 import com.mush.farm.game.GameEventQueue;
+import com.mush.farm.game.events.BodyEvent;
 import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
 import java.util.ArrayList;
@@ -72,6 +73,13 @@ public class GameMap {
 
     public void onEvent(MapEvent.SpawnOnTile event) {
         spawnOnTile(event.u, event.v, event.type);
+    }
+    
+    public void onEvent(BodyEvent.ChangeType event) {
+        // use body.id
+        // Body body = getBody(event.bodyId);
+        Body body = event.body;
+        body.type = event.type;
     }
 
     private void createMap() {

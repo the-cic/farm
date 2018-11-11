@@ -67,7 +67,9 @@ public class GameRenderer {
 
             bodySpriteMap.put(BodyType.PERSON, cutTile(spritesImage, 0, 0));
             bodySpriteMap.put(BodyType.POTATO, cutTile(spritesImage, 1, 0));
-            bodySpriteMap.put(BodyType.BUCKET, cutTile(spritesImage, 2, 0));
+            bodySpriteMap.put(BodyType.BUCKET_EMPTY, cutTile(spritesImage, 2, 0));
+            bodySpriteMap.put(BodyType.BUCKET_FULL, cutTile(spritesImage, 3, 0));
+            bodySpriteMap.put(BodyType.SHOVEL, cutTile(spritesImage, 4, 0));
 
         } catch (IOException e) {
 

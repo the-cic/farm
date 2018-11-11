@@ -89,5 +89,13 @@ public class MapObject {
     public double getAgePercent() {
         return age / maxAge;
     }
+    
+    public int getU() {
+        return u;
+    }
+
+    public int getV() {
+        return v;
+    }
 
 }

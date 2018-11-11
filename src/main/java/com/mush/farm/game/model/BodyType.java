@@ -12,5 +12,7 @@ package com.mush.farm.game.model;
 public enum BodyType {
     PERSON,
     POTATO,
-    BUCKET;
+    BUCKET_EMPTY,
+    BUCKET_FULL,
+    SHOVEL;
 }

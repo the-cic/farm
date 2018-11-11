@@ -32,6 +32,7 @@ public class Game {
     public GameKeyboardListener keyboardListener;
     public GameEventQueue eventQueue;
     public GameCharacters characters;
+    private GameInteractionsLogic interactionsLogic;
 
     private MovableCharacter playerCharacter;
     private boolean showStats;
@@ -44,9 +45,11 @@ public class Game {
         characters = new GameCharacters(gameMap, eventQueue);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
+        interactionsLogic = new GameInteractionsLogic(this, eventQueue);
 
         eventQueue.addListener(this);
         eventQueue.addListener(gameMap);
+        eventQueue.addListener(interactionsLogic);
 
         showStats = false;
 
@@ -57,8 +60,10 @@ public class Game {
     // todo: ugly, put all of this somewhere else
     private void setupBodies() {
         for (int i = 0; i < 3; i++) {
-            gameMap.spawnBody(BodyType.BUCKET, Math.random() * 25 * 16, Math.random() * 25 * 16);
+            gameMap.spawnBody(BodyType.BUCKET_EMPTY, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
+        
+        gameMap.spawnBody(BodyType.SHOVEL, Math.random() * 25 * 16, Math.random() * 25 * 16);
 
         for (int i = 0; i < 3; i++) {
             characters.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
@@ -116,7 +121,7 @@ public class Game {
     public void onEvent(GenericGameEvent event) {
         switch (event.eventName) {
             case "setTile":
-                setTile((MapObjectType) event.eventPayload);
+                setTileUnderPlayer((MapObjectType) event.eventPayload);
                 break;
         }
     }
@@ -197,25 +202,14 @@ public class Game {
         character.cycleInventory();
     }
 
-    public void onEvent(InteractionEvent.BodyOnBody event) {
-        System.out.println("interaction by c.id:" + event.character.characterId
-                + " with tool.type:" + event.tool.type
-                + " on target.type:" + event.target.type);
-    }
-
-    public void onEvent(InteractionEvent.BodyOnMapObject event) {
-        System.out.println("interaction by c.id:" + event.character.characterId
-                + " with tool.type:" + event.tool.type
-                + " on target.type:" + event.target.type);
-    }
-
     private void onJoystick() {
         playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
-    private void setTile(MapObjectType type) {
-        int u = (int) ((playerCharacter.body.position.x) / GameRenderer.TILE_SIZE);
-        int v = (int) ((playerCharacter.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+    private void setTileUnderPlayer(MapObjectType type) {
+        MovableCharacter character = playerCharacter;
+        int u = (int) ((character.body.position.x) / GameRenderer.TILE_SIZE);
+        int v = (int) ((character.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
         gameMap.setTile(u, v, type);
     }
