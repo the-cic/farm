@@ -48,20 +48,42 @@ public class MovableCharacter {
         body.position.y += velocity.y * elapsedSeconds * movementSpeed;
     }
 
-    public void interact() {
+    public void sendInteract() {
         eventQueue.add(new CharacterEvent.Interact(this));
     }
 
-    public void drop() {
+    public void sendDrop() {
         eventQueue.add(new CharacterEvent.Drop(this));
     }
 
-    public void equip() {
-        eventQueue.add(new CharacterEvent.Equip(this));
+    public void sendEquip(int index) {
+        eventQueue.add(new CharacterEvent.Equip(this, index));
+    }
+    
+    public void sendEquipLast() {
+        int lastIndex = getInventory().size() - 1;
+        if (lastIndex >= 0) {
+            eventQueue.add(new CharacterEvent.Equip(this, lastIndex));
+        }
+    }
+    
+    public void sendUnequip() {
+        eventQueue.add(new CharacterEvent.Unequip(this));
+    }
+    
+    public void sendCycleInventory() {
+        eventQueue.add(new CharacterEvent.CycleInventory(this));
     }
 
-    public void equipFirst() {
+    public void cycleInventory() {
         Body inventoryItem = removeFromInventory(0);
+        if (inventoryItem != null) {
+            addToInventory(inventoryItem);
+        }
+    }
+    
+    public void equipFromInventory(int index) {
+        Body inventoryItem = removeFromInventory(index);
         Body equippedItem = unEquip();
         if (equippedItem != null) {
             addToInventory(equippedItem);
@@ -70,12 +92,19 @@ public class MovableCharacter {
             equip(inventoryItem);
         }
     }
+    
+    public void unequipIntoInventory() {
+        Body equippedItem = unEquip();
+        if (equippedItem != null) {
+            addToInventory(equippedItem);
+        }
+    }
 
-    public void equip(Body item) {
+    private void equip(Body item) {
         equippedBody = item;
     }
 
-    public Body unEquip() {
+    private Body unEquip() {
         Body item = equippedBody;
         equippedBody = null;
         return item;

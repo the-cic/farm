@@ -35,8 +35,25 @@ public abstract class CharacterEvent extends GameEvent {
     }
     
     public static class Equip extends CharacterEvent {
+        
+        public final int inventoryIndex;
 
-        public Equip(MovableCharacter character) {
+        public Equip(MovableCharacter character, int inventoryIndex) {
+            super(character);
+            this.inventoryIndex = inventoryIndex;
+        }
+    }
+    
+    public static class Unequip extends CharacterEvent {
+
+        public Unequip(MovableCharacter character) {
+            super(character);
+        }
+    }
+    
+    public static class CycleInventory extends CharacterEvent {
+
+        public CycleInventory(MovableCharacter character) {
             super(character);
         }
     }

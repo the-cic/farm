@@ -178,7 +178,23 @@ public class Game {
         if (character == null) {
             return;
         }
-        character.equipFirst();
+        character.equipFromInventory(event.inventoryIndex);
+    }
+
+    public void onEvent(CharacterEvent.Unequip event) {
+        MovableCharacter character = characters.getCharacter(event.characterId);
+        if (character == null) {
+            return;
+        }
+        character.unequipIntoInventory();
+    }
+
+    public void onEvent(CharacterEvent.CycleInventory event) {
+        MovableCharacter character = characters.getCharacter(event.characterId);
+        if (character == null) {
+            return;
+        }
+        character.cycleInventory();
     }
 
     public void onEvent(InteractionEvent.BodyOnBody event) {

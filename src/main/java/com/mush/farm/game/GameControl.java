@@ -48,22 +48,33 @@ public class GameControl {
     public void actionPlayerInteract() {
         MovableCharacter player = game.getPlayer();
         if (player != null) {
-            player.interact();
+            player.sendInteract();
         }
     }
 
     public void actionPlayerDrop() {
         MovableCharacter player = game.getPlayer();
         if (player != null) {
-            player.drop();
+            player.sendDrop();
         }
     }
 
     public void actionPlayerEquip() {
         MovableCharacter player = game.getPlayer();
         if (player != null) {
-            player.equip();
+            if (player.getEquipped() == null) {
+                player.sendEquipLast();
+            } else {
+                player.sendUnequip();
+            }
         }
     }
-
+    
+    public void actionCycleInventory() {
+        MovableCharacter player = game.getPlayer();
+        if (player != null) {
+            player.sendCycleInventory();
+        }
+    }
+    
 }
