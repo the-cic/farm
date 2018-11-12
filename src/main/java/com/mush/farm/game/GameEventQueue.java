@@ -43,11 +43,13 @@ public class GameEventQueue {
     }
 
     public void process() {
-        synchronized (queue) {
+        try {
             while (!queue.isEmpty()) {
                 GameEvent event = queue.removeFirst();
                 process(event);
             }
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
         }
     }
 
