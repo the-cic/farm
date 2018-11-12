@@ -52,6 +52,10 @@ public class MovableCharacter {
         eventQueue.add(new CharacterEvent.Interact(this));
     }
 
+    public void sendGive() {
+        eventQueue.add(new CharacterEvent.Give(this));
+    }
+
     public void sendPickUp() {
         eventQueue.add(new CharacterEvent.PickUp(this));
     }
@@ -103,6 +107,14 @@ public class MovableCharacter {
             addToInventory(equippedItem);
         }
     }
+    
+    public Body unequipDirectly() {
+        return unEquip();
+    }
+    
+    public void equipDirectly(Body item) {
+        equip(item);
+    }
 
     private void equip(Body item) {
         equippedBody = item;
@@ -114,6 +126,10 @@ public class MovableCharacter {
         return item;
     }
 
+    public boolean hasEquipped() {
+        return equippedBody != null;
+    }
+    
     public Body getEquipped() {
         return equippedBody;
     }

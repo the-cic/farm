@@ -135,7 +135,7 @@ public class Game {
             return;
         }
 
-        Body nearest = getClosestBodyTo(character.body);
+        Body nearest = getClosestBodyTo(character.body, 1);
         Body tool = character.getEquipped();
 
         if (tool != null) {
@@ -150,11 +150,42 @@ public class Game {
         }
     }
 
-    public Body getClosestBodyTo(Body body0) {
+    public void onEvent(CharacterEvent.Give event) {
+        MovableCharacter character = characters.getCharacter(event.characterId);
+        if (character == null) {
+            return;
+        }
+
+        if (character.hasEquipped()) {
+            Body nearest = getClosestCharacterBodyTo(character.body, 2);
+
+            if (nearest != null && nearest.character != null) {
+                MovableCharacter peer = nearest.character;
+
+                Body item = character.unequipDirectly();
+
+                if (peer.hasEquipped()) {
+                    peer.addToInventory(item);
+                } else {
+                    peer.equipDirectly(item);
+                }
+            }
+        }
+    }
+
+    public Body getClosestCharacterBodyTo(Body body0, double distance) {
+        return getClosestBodyTo(body0, true, distance);
+    }
+
+    public Body getClosestBodyTo(Body body0, double distance) {
+        return getClosestBodyTo(body0, false, distance);
+    }
+
+    public Body getClosestBodyTo(Body body0, boolean character, double distance) {
         double shortest = Double.POSITIVE_INFINITY;
         Body nearest = null;
         for (Body aBody : bodies.getBodies()) {
-            if (aBody != body0) {
+            if (aBody != body0 && (!character || aBody.character != null)) {
                 double dx = aBody.position.x - body0.position.x;
                 double dy = aBody.position.y - body0.position.y;
                 double dist = Math.sqrt(dx * dx + dy * dy);
@@ -162,9 +193,10 @@ public class Game {
                     shortest = dist;
                     nearest = aBody;
                 }
+
             }
         }
-        if (nearest != null && shortest < GameRenderer.TILE_SIZE) {
+        if (nearest != null && shortest < GameRenderer.TILE_SIZE * distance) {
             return nearest;
         }
         return null;
@@ -176,7 +208,7 @@ public class Game {
             return;
         }
 
-        Body nearest = getClosestBodyTo(character.body);
+        Body nearest = getClosestBodyTo(character.body, 1);
 
         if (nearest != null) {
             bodies.getBodies().remove(nearest);

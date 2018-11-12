@@ -27,6 +27,13 @@ public abstract class CharacterEvent extends GameEvent {
         }
     }
     
+    public static class Give extends CharacterEvent {
+
+        public Give(MovableCharacter character) {
+            super(character);
+        }
+    }
+    
     public static class PickUp extends CharacterEvent {
 
         public PickUp(MovableCharacter character) {

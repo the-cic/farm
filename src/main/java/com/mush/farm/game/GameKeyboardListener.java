@@ -74,6 +74,9 @@ public class GameKeyboardListener implements KeyListener {
             case KeyEvent.VK_F:
                 control.actionPlayerInteract();
                 break;
+            case KeyEvent.VK_G:
+                control.actionPlayerGive();
+                break;
             case KeyEvent.VK_I:
                 control.actionCycleInventory();
                 break;
