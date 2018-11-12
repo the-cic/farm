@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
     private void init() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        ImageIcon img = new ImageIcon("./icon.png");
+        ImageIcon img = new ImageIcon("img/icon.png");
         setIconImage(img.getImage());
 
         game = new Game();
@@ -38,13 +38,13 @@ public class MainFrame extends JFrame {
 
         panel = new MainPanel(game.renderer);
         panel.setVisible(true);
-        
+
         int tileSize = GameRenderer.TILE_SIZE * GameRenderer.TILE_ZOOM;
-        
-        panel.setPreferredSize(new Dimension(GameMap.MAP_WIDTH * tileSize, GameMap.MAP_HEIGHT * tileSize));        
+
+        panel.setPreferredSize(new Dimension(GameMap.MAP_WIDTH * tileSize, GameMap.MAP_HEIGHT * tileSize));
 
         add(panel);
-        
+
         pack();
 
         refreshThread = new RefreshThread(game, panel);
