@@ -52,6 +52,10 @@ public class MovableCharacter {
         eventQueue.add(new CharacterEvent.Interact(this));
     }
 
+    public void sendPickUp() {
+        eventQueue.add(new CharacterEvent.PickUp(this));
+    }
+
     public void sendDrop() {
         eventQueue.add(new CharacterEvent.Drop(this));
     }

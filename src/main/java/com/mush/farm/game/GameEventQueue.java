@@ -43,9 +43,11 @@ public class GameEventQueue {
     }
 
     public void process() {
-        while (!queue.isEmpty()) {
-            GameEvent event = queue.removeFirst();
-            process(event);
+        synchronized (queue) {
+            while (!queue.isEmpty()) {
+                GameEvent event = queue.removeFirst();
+                process(event);
+            }
         }
     }
 
@@ -67,7 +69,7 @@ public class GameEventQueue {
                 | IllegalAccessException
                 | IllegalArgumentException
                 | InvocationTargetException ex) {
-            
+
             ex.printStackTrace(System.out);
         }
     }

@@ -29,15 +29,19 @@ public class GameKeyboardListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 control.joystick.pushLeft();
                 break;
             case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 control.joystick.pushRight();
                 break;
             case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 control.joystick.pushUp();
                 break;
             case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 control.joystick.pushDown();
                 break;
             case KeyEvent.VK_V:
@@ -59,13 +63,16 @@ public class GameKeyboardListener implements KeyListener {
                 control.debugEvent("setTile", MapObjectType.DIRT_HOLE);
                 break;
             case KeyEvent.VK_E:
-                control.actionPlayerInteract();
+                control.actionPlayerPickUp();
                 break;
             case KeyEvent.VK_Q:
                 control.actionPlayerDrop();
                 break;
-            case KeyEvent.VK_F:
+            case KeyEvent.VK_R:
                 control.actionPlayerEquip();
+                break;
+            case KeyEvent.VK_F:
+                control.actionPlayerInteract();
                 break;
             case KeyEvent.VK_I:
                 control.actionCycleInventory();
@@ -73,7 +80,7 @@ public class GameKeyboardListener implements KeyListener {
             case KeyEvent.VK_P:
                 control.togglePause();
                 break;
-            case KeyEvent.VK_R:
+            case KeyEvent.VK_T:
                 control.changeCharacter();
                 break;
         }
@@ -85,15 +92,19 @@ public class GameKeyboardListener implements KeyListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
                 control.joystick.releaseLeft();
                 break;
             case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
                 control.joystick.releaseRight();
                 break;
             case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
                 control.joystick.releaseUp();
                 break;
             case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
                 control.joystick.releaseDown();
                 break;
         }

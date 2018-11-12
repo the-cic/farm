@@ -62,7 +62,7 @@ public class Game {
         for (int i = 0; i < 3; i++) {
             gameMap.spawnBody(BodyType.BUCKET_EMPTY, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
-        
+
         gameMap.spawnBody(BodyType.SHOVEL, Math.random() * 25 * 16, Math.random() * 25 * 16);
 
         for (int i = 0; i < 3; i++) {
@@ -131,36 +131,53 @@ public class Game {
         if (character == null) {
             return;
         }
-        double shortest = Double.POSITIVE_INFINITY;
-        Body nearest = null;
-        for (Body body : gameMap.getBodies()) {
-            if (body != character.body) {
-                double dx = body.position.x - character.body.position.x;
-                double dy = body.position.y - character.body.position.y;
-                double dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < shortest) {
-                    shortest = dist;
-                    nearest = body;
-                }
-            }
-        }
 
+        Body nearest = getClosestBodyTo(character.body);
         Body tool = character.getEquipped();
 
-        if (nearest != null && shortest < GameRenderer.TILE_SIZE) {
-            if (tool != null) {
-                eventQueue.add(new InteractionEvent.BodyOnBody(character, tool, nearest));
-            } else {
-                gameMap.getBodies().remove(nearest);
-                character.addToInventory(nearest);
-            }
-        }
         if (tool != null) {
+            if (nearest != null) {
+                eventQueue.add(new InteractionEvent.BodyOnBody(character, tool, nearest));
+            }
             int u = (int) ((playerCharacter.body.position.x) / GameRenderer.TILE_SIZE);
             int v = (int) ((playerCharacter.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
             MapObject mapObject = gameMap.getMapObject(u, v);
             eventQueue.add(new InteractionEvent.BodyOnMapObject(character, tool, mapObject));
+        }
+    }
+
+    public Body getClosestBodyTo(Body body0) {
+        double shortest = Double.POSITIVE_INFINITY;
+        Body nearest = null;
+        for (Body aBody : gameMap.getBodies()) {
+            if (aBody != body0) {
+                double dx = aBody.position.x - body0.position.x;
+                double dy = aBody.position.y - body0.position.y;
+                double dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < shortest) {
+                    shortest = dist;
+                    nearest = aBody;
+                }
+            }
+        }
+        if (nearest != null && shortest < GameRenderer.TILE_SIZE) {
+            return nearest;
+        }
+        return null;
+    }
+
+    public void onEvent(CharacterEvent.PickUp event) {
+        MovableCharacter character = characters.getCharacter(event.characterId);
+        if (character == null) {
+            return;
+        }
+
+        Body nearest = getClosestBodyTo(character.body);
+
+        if (nearest != null) {
+            gameMap.getBodies().remove(nearest);
+            character.addToInventory(nearest);
         }
     }
 

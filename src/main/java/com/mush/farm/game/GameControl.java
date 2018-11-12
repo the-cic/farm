@@ -52,6 +52,13 @@ public class GameControl {
         }
     }
 
+    public void actionPlayerPickUp() {
+        MovableCharacter player = game.getPlayer();
+        if (player != null) {
+            player.sendPickUp();
+        }
+    }
+
     public void actionPlayerDrop() {
         MovableCharacter player = game.getPlayer();
         if (player != null) {
