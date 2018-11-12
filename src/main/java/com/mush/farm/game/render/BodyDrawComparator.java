@@ -12,7 +12,7 @@ import java.util.Comparator;
  *
  * @author mush
  */
-public class BodyComparator implements Comparator<Body> {
+public class BodyDrawComparator implements Comparator<Body> {
 
     @Override
     public int compare(Body body1, Body body2) {

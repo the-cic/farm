@@ -16,12 +16,13 @@ import com.mush.farm.game.model.BodyType;
 public class BodyEvent extends GameEvent {
 
     public final int bodyId;
-    // get rid of this when bodies have ids
-    public final Body body;
 
     public BodyEvent(Body body) {
-        this.bodyId = 0; // body.id;
-        this.body = body;
+        this.bodyId = body.bodyId;
+    }
+    
+    public BodyEvent(int bodyId) {
+        this.bodyId = bodyId;
     }
 
     public static class ChangeType extends BodyEvent {
@@ -30,6 +31,11 @@ public class BodyEvent extends GameEvent {
 
         public ChangeType(Body body, BodyType type) {
             super(body);
+            this.type = type;
+        }
+        
+        public ChangeType(int bodyId, BodyType type) {
+            super(bodyId);
             this.type = type;
         }
     }

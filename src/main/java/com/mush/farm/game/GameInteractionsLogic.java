@@ -27,7 +27,7 @@ public class GameInteractionsLogic {
     public void onEvent(InteractionEvent.BodyOnBody event) {
         System.out.println("interaction by c.id:" + event.characterId
                 + " with tool.type:" + event.toolType
-                + " on target.type:" + event.target.type);
+                + " on target.type:" + event.targetType);
     }
 
     public void onEvent(InteractionEvent.BodyOnMapObject event) {
@@ -51,13 +51,13 @@ public class GameInteractionsLogic {
     private void bucketFullOnTile(InteractionEvent.BodyOnMapObject event) {
         if (event.targetType == MapObjectType.DIRT_HOLE) {
             game.gameMap.setTile(event.targetU, event.targetV, MapObjectType.WATER);
-            eventQueue.add(new BodyEvent.ChangeType(event.tool, BodyType.BUCKET_EMPTY));
+            eventQueue.add(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_EMPTY));
         }
     }
 
     private void bucketEmptyOnTile(InteractionEvent.BodyOnMapObject event) {
         if (event.targetType == MapObjectType.WATER) {
-            eventQueue.add(new BodyEvent.ChangeType(event.tool, BodyType.BUCKET_FULL));
+            eventQueue.add(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_FULL));
         }
     }
     

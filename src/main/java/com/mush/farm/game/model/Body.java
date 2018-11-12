@@ -15,18 +15,20 @@ import java.util.List;
  */
 public class Body {
 
+    public final int bodyId;
     public final Point2D.Double position = new Point2D.Double(0, 0);
     public BodyType type;
     public MovableCharacter character;
     public List<Body> containedBodies;
 
-    public Body(BodyType type) {
+    public Body(int id, BodyType type) {
+        this.bodyId = id;
         this.type = type;
         this.containedBodies = new ArrayList<>();
     }
 
-    public Body(BodyType type, MovableCharacter character) {
-        this(type);
+    public Body(int id, BodyType type, MovableCharacter character) {
+        this(id, type);
         this.character = character;
     }
 

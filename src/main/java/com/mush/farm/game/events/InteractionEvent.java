@@ -24,27 +24,25 @@ public class InteractionEvent extends GameEvent {
         this.characterId = characterId;
     }
     
-    // TODO: keep references out of events
-    // to do that, handle ids of bodies
     public static class BodyOnBody extends InteractionEvent {
         
-        public final Body tool;
-        public final Body target;
+        public final int toolId;
+        public final int targetId;
         public final BodyType toolType;
         public final BodyType targetType;
         
         public BodyOnBody(MovableCharacter character, Body toolBody, Body targetBody) {
             super(character.characterId);
-            this.tool = toolBody;
+            this.toolId = toolBody.bodyId;
             this.toolType = toolBody.type;
-            this.target = targetBody;
+            this.targetId = targetBody.bodyId;
             this.targetType = targetBody.type;
         }
     }
     
     public static class BodyOnMapObject extends InteractionEvent {
         
-        public final Body tool;
+        public final int toolId;
         public final BodyType toolType;
         public final MapObjectType targetType;
         public final int targetU;
@@ -52,7 +50,7 @@ public class InteractionEvent extends GameEvent {
         
         public BodyOnMapObject(MovableCharacter character, Body toolBody, MapObject targetMapObject) {
             super(character.characterId);
-            this.tool = toolBody;
+            this.toolId = toolBody.bodyId;
             this.toolType = toolBody.type;
             this.targetType = targetMapObject.type;
             this.targetU = targetMapObject.getU();

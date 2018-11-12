@@ -17,14 +17,14 @@ import java.util.Map;
  */
 public class GameCharacters {
 
-    private GameMap gameMap;
+    private GameBodies gameBodies;
     private GameEventQueue eventQueue;
     private List<MovableCharacter> characters;
     private Map<Integer, MovableCharacter> characterMap;
     private int nextCharacterId = 0;
 
-    public GameCharacters(GameMap gameMap, GameEventQueue queue) {
-        this.gameMap = gameMap;
+    public GameCharacters(GameBodies gameBodies, GameEventQueue queue) {
+        this.gameBodies = gameBodies;
         this.eventQueue = queue;
         this.characters = new LinkedList<>();
         this.characterMap = new HashMap<>();
@@ -50,7 +50,7 @@ public class GameCharacters {
 
         MovableCharacter character = new MovableCharacter(
                 characterId,
-                gameMap.spawnBody(bodyType, x, y),
+                gameBodies.spawnBody(bodyType, x, y),
                 eventQueue);
 
         characters.add(character);

@@ -12,6 +12,7 @@ import com.mush.farm.game.events.InteractionEvent;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
+import com.mush.farm.game.model.GameBodies;
 import com.mush.farm.game.model.GameCharacters;
 import com.mush.farm.game.model.MovableCharacter;
 import com.mush.farm.game.model.GameMap;
@@ -31,6 +32,7 @@ public class Game {
     public GameMap gameMap;
     public GameKeyboardListener keyboardListener;
     public GameEventQueue eventQueue;
+    public GameBodies bodies;
     public GameCharacters characters;
     private GameInteractionsLogic interactionsLogic;
 
@@ -41,8 +43,9 @@ public class Game {
     public Game() {
         eventQueue = new GameEventQueue();
         control = new GameControl(this);
-        gameMap = new GameMap(eventQueue);
-        characters = new GameCharacters(gameMap, eventQueue);
+        bodies = new GameBodies();
+        characters = new GameCharacters(bodies, eventQueue);
+        gameMap = new GameMap(bodies, eventQueue);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
         interactionsLogic = new GameInteractionsLogic(this, eventQueue);
@@ -60,10 +63,10 @@ public class Game {
     // todo: ugly, put all of this somewhere else
     private void setupBodies() {
         for (int i = 0; i < 3; i++) {
-            gameMap.spawnBody(BodyType.BUCKET_EMPTY, Math.random() * 25 * 16, Math.random() * 25 * 16);
+            bodies.spawnBody(BodyType.BUCKET_EMPTY, Math.random() * 25 * 16, Math.random() * 25 * 16);
         }
 
-        gameMap.spawnBody(BodyType.SHOVEL, Math.random() * 25 * 16, Math.random() * 25 * 16);
+        bodies.spawnBody(BodyType.SHOVEL, Math.random() * 25 * 16, Math.random() * 25 * 16);
 
         for (int i = 0; i < 3; i++) {
             characters.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
@@ -150,7 +153,7 @@ public class Game {
     public Body getClosestBodyTo(Body body0) {
         double shortest = Double.POSITIVE_INFINITY;
         Body nearest = null;
-        for (Body aBody : gameMap.getBodies()) {
+        for (Body aBody : bodies.getBodies()) {
             if (aBody != body0) {
                 double dx = aBody.position.x - body0.position.x;
                 double dy = aBody.position.y - body0.position.y;
@@ -176,7 +179,7 @@ public class Game {
         Body nearest = getClosestBodyTo(character.body);
 
         if (nearest != null) {
-            gameMap.getBodies().remove(nearest);
+            bodies.getBodies().remove(nearest);
             character.addToInventory(nearest);
         }
     }
@@ -191,7 +194,7 @@ public class Game {
             item.position.setLocation(character.body.position);
             // just a tiny bit in front of the character
             item.position.y += 1;
-            gameMap.getBodies().add(item);
+            bodies.getBodies().add(item);
         }
     }
 

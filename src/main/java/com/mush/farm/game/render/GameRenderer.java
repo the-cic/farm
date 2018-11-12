@@ -40,7 +40,7 @@ public class GameRenderer {
     private BufferedImage spritesImage = null;
     private Map<MapObjectType, BufferedImage> tileMap;
     private Map<BodyType, BufferedImage> bodySpriteMap;
-    private final BodyComparator bodyComparator;
+    private final BodyDrawComparator bodyComparator;
 
     public GameRenderer(Game game) {
         this.game = game;
@@ -48,7 +48,7 @@ public class GameRenderer {
 
         tileMap = new HashMap<>();
         bodySpriteMap = new HashMap<>();
-        bodyComparator = new BodyComparator();
+        bodyComparator = new BodyDrawComparator();
 
         try {
             tilesImage = ImageIO.read(new File("img/tiles.png"));
@@ -103,8 +103,7 @@ public class GameRenderer {
             }
         }
 
-        // todo: depth sorting
-        List<Body> depthSortedBodies = depthSortBodies(gameMap.getBodies());
+        List<Body> depthSortedBodies = depthSortBodies(game.bodies.getBodies());
 
         for (Body body : depthSortedBodies) {
             render(g, body);

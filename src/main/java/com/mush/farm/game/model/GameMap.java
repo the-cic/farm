@@ -9,8 +9,6 @@ import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.BodyEvent;
 import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -24,12 +22,13 @@ public class GameMap {
 
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
-    private List<Body> mapBodies;
     private double totalElapsedSeconds = 0;
     private final GameEventQueue eventQueue;
+    private final GameBodies bodies;
 
-    public GameMap(GameEventQueue eventQueue) {
+    public GameMap(GameBodies bodies, GameEventQueue eventQueue) {
         this.eventQueue = eventQueue;
+        this.bodies = bodies;
         createMap();
     }
 
@@ -74,12 +73,12 @@ public class GameMap {
     public void onEvent(MapEvent.SpawnOnTile event) {
         spawnOnTile(event.u, event.v, event.type);
     }
-    
+
     public void onEvent(BodyEvent.ChangeType event) {
-        // use body.id
-        // Body body = getBody(event.bodyId);
-        Body body = event.body;
-        body.type = event.type;
+        Body body = bodies.getBody(event.bodyId);
+        if (body != null) {
+            body.type = event.type;
+        }
     }
 
     private void createMap() {
@@ -92,20 +91,6 @@ public class GameMap {
             mapObjects[i] = null;
             waterMap[i] = new MapWater();
         }
-
-        mapBodies = new ArrayList<>();
-    }
-
-    public Body spawnBody(BodyType type, double x, double y) {
-        Body body = new Body(type);
-        body.position.setLocation(x, y);
-        mapBodies.add(body);
-        return body;
-    }
-
-    // todo: maybe something more useful, like a bound box of bodies?
-    public List<Body> getBodies() {
-        return mapBodies;
     }
 
     public MapObject getMapObject(int u, int v) {
@@ -192,7 +177,7 @@ public class GameMap {
     private void spawnOnTile(int u, int v, BodyType type) {
         int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
         int y = v * GameRenderer.TILE_SIZE;
-        spawnBody(type, x, y);
+        bodies.spawnBody(type, x, y);
     }
 
     private void propagate(MapWater water, int i, int j) {
