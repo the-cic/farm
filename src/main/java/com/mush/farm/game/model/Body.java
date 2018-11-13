@@ -18,7 +18,7 @@ public class Body {
     public final int bodyId;
     public final Point2D.Double position = new Point2D.Double(0, 0);
     public BodyType type;
-    public MovableCharacter character;
+    public Creature creature;
     public List<Body> containedBodies;
 
     public Body(int id, BodyType type) {
@@ -27,9 +27,9 @@ public class Body {
         this.containedBodies = new ArrayList<>();
     }
 
-    public Body(int id, BodyType type, MovableCharacter character) {
+    public Body(int id, BodyType type, Creature creature) {
         this(id, type);
-        this.character = character;
+        this.creature = creature;
     }
 
 }

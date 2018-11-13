@@ -5,7 +5,7 @@
  */
 package com.mush.farm.game;
 
-import com.mush.farm.game.events.CharacterEvent;
+import com.mush.farm.game.events.CreatureEvent;
 import com.mush.farm.game.events.ControlEvent;
 import com.mush.farm.game.events.GenericGameEvent;
 import com.mush.farm.game.events.InteractionEvent;
@@ -13,8 +13,8 @@ import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.GameBodies;
-import com.mush.farm.game.model.GameCharacters;
-import com.mush.farm.game.model.MovableCharacter;
+import com.mush.farm.game.model.GameCreatures;
+import com.mush.farm.game.model.Creature;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.GameMapGenerator;
 import com.mush.farm.game.model.MapObject;
@@ -33,10 +33,10 @@ public class Game {
     public GameKeyboardListener keyboardListener;
     public GameEventQueue eventQueue;
     public GameBodies bodies;
-    public GameCharacters characters;
+    public GameCreatures creatures;
     private GameInteractionsLogic interactionsLogic;
 
-    private MovableCharacter playerCharacter;
+    private Creature playerCreature;
     private boolean showStats;
     private boolean paused = false;
 
@@ -44,7 +44,7 @@ public class Game {
         eventQueue = new GameEventQueue();
         control = new GameControl(this);
         bodies = new GameBodies();
-        characters = new GameCharacters(bodies, eventQueue);
+        creatures = new GameCreatures(bodies, eventQueue);
         gameMap = new GameMap(bodies, eventQueue);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
@@ -69,10 +69,10 @@ public class Game {
         bodies.spawnBody(BodyType.SHOVEL, Math.random() * 25 * 16, Math.random() * 25 * 16);
 
         for (int i = 0; i < 3; i++) {
-            characters.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
+            creatures.spawn((int) (100 + Math.random() * 200), (int) (20 + Math.random() * 200), BodyType.PERSON);
         }
 
-        playerCharacter = characters.getCharacters().get(0);
+        playerCreature = creatures.getCreatures().get(0);
     }
 
     public void update(double elapsedSeconds) {
@@ -80,7 +80,7 @@ public class Game {
 
         double seconds = paused ? 0 : elapsedSeconds;
 
-        characters.update(seconds);
+        creatures.update(seconds);
         gameMap.update(seconds);
     }
 
@@ -88,16 +88,16 @@ public class Game {
         paused = !paused;
     }
 
-    public void changeCharacter() {
-        List<MovableCharacter> all = characters.getCharacters();
-        int ind = all.indexOf(playerCharacter);
+    public void changeCreature() {
+        List<Creature> all = creatures.getCreatures();
+        int ind = all.indexOf(playerCreature);
         ind++;
-        playerCharacter.velocity.setLocation(0, 0);
-        playerCharacter = ind >= all.size() ? all.get(0) : all.get(ind);
+        playerCreature.velocity.setLocation(0, 0);
+        playerCreature = ind >= all.size() ? all.get(0) : all.get(ind);
     }
 
-    public MovableCharacter getPlayer() {
-        return playerCharacter;
+    public Creature getPlayer() {
+        return playerCreature;
     }
 
     public boolean getShowStats() {
@@ -115,8 +115,8 @@ public class Game {
             case TOGGLE_STATS:
                 showStats = !showStats;
                 break;
-            case CHANGE_CHARACTER:
-                changeCharacter();
+            case CHANGE_CREATURE:
+                changeCreature();
                 break;
         }
     }
@@ -129,40 +129,40 @@ public class Game {
         }
     }
 
-    public void onEvent(CharacterEvent.Interact event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.Interact event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
 
-        Body nearest = getClosestBodyTo(character.body, 1);
-        Body tool = character.getEquipped();
+        Body nearest = getClosestBodyTo(creature.body, 1);
+        Body tool = creature.getEquipped();
 
         if (tool != null) {
             if (nearest != null) {
-                eventQueue.add(new InteractionEvent.BodyOnBody(character, tool, nearest));
+                eventQueue.add(new InteractionEvent.BodyOnBody(creature, tool, nearest));
             }
-            int u = (int) ((playerCharacter.body.position.x) / GameRenderer.TILE_SIZE);
-            int v = (int) ((playerCharacter.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+            int u = (int) ((playerCreature.body.position.x) / GameRenderer.TILE_SIZE);
+            int v = (int) ((playerCreature.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
             MapObject mapObject = gameMap.getMapObject(u, v);
-            eventQueue.add(new InteractionEvent.BodyOnMapObject(character, tool, mapObject));
+            eventQueue.add(new InteractionEvent.BodyOnMapObject(creature, tool, mapObject));
         }
     }
 
-    public void onEvent(CharacterEvent.Give event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.Give event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
 
-        if (character.hasEquipped()) {
-            Body nearest = getClosestCharacterBodyTo(character.body, 2);
+        if (creature.hasEquipped()) {
+            Body nearest = getClosestCreatureBodyTo(creature.body, 2);
 
-            if (nearest != null && nearest.character != null) {
-                MovableCharacter peer = nearest.character;
+            if (nearest != null && nearest.creature != null) {
+                Creature peer = nearest.creature;
 
-                Body item = character.unequipDirectly();
+                Body item = creature.unequipDirectly();
 
                 if (peer.hasEquipped()) {
                     peer.addToInventory(item);
@@ -173,7 +173,7 @@ public class Game {
         }
     }
 
-    public Body getClosestCharacterBodyTo(Body body0, double distance) {
+    public Body getClosestCreatureBodyTo(Body body0, double distance) {
         return getClosestBodyTo(body0, true, distance);
     }
 
@@ -181,11 +181,11 @@ public class Game {
         return getClosestBodyTo(body0, false, distance);
     }
 
-    public Body getClosestBodyTo(Body body0, boolean character, double distance) {
+    public Body getClosestBodyTo(Body body0, boolean isCreature, double distance) {
         double shortest = Double.POSITIVE_INFINITY;
         Body nearest = null;
         for (Body aBody : bodies.getBodies()) {
-            if (aBody != body0 && (!character || aBody.character != null)) {
+            if (aBody != body0 && (!isCreature || aBody.creature != null)) {
                 double dx = aBody.position.x - body0.position.x;
                 double dy = aBody.position.y - body0.position.y;
                 double dist = Math.sqrt(dx * dx + dy * dy);
@@ -202,66 +202,66 @@ public class Game {
         return null;
     }
 
-    public void onEvent(CharacterEvent.PickUp event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.PickUp event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
 
-        Body nearest = getClosestBodyTo(character.body, 1);
+        Body nearest = getClosestBodyTo(creature.body, 1);
 
         if (nearest != null) {
             bodies.getBodies().remove(nearest);
-            character.addToInventory(nearest);
+            creature.addToInventory(nearest);
         }
     }
 
-    public void onEvent(CharacterEvent.Drop event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.Drop event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
-        Body item = character.removeLastFromInventory();
+        Body item = creature.removeLastFromInventory();
         if (item != null) {
-            item.position.setLocation(character.body.position);
-            // just a tiny bit in front of the character
+            item.position.setLocation(creature.body.position);
+            // just a tiny bit in front of the creature
             item.position.y += 1;
             bodies.getBodies().add(item);
         }
     }
 
-    public void onEvent(CharacterEvent.Equip event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.Equip event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
-        character.equipFromInventory(event.inventoryIndex);
+        creature.equipFromInventory(event.inventoryIndex);
     }
 
-    public void onEvent(CharacterEvent.Unequip event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.Unequip event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
-        character.unequipIntoInventory();
+        creature.unequipIntoInventory();
     }
 
-    public void onEvent(CharacterEvent.CycleInventory event) {
-        MovableCharacter character = characters.getCharacter(event.characterId);
-        if (character == null) {
+    public void onEvent(CreatureEvent.CycleInventory event) {
+        Creature creature = creatures.getCreature(event.creatureId);
+        if (creature == null) {
             return;
         }
-        character.cycleInventory();
+        creature.cycleInventory();
     }
 
     private void onJoystick() {
-        playerCharacter.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
+        playerCreature.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
     private void setTileUnderPlayer(MapObjectType type) {
-        MovableCharacter character = playerCharacter;
-        int u = (int) ((character.body.position.x) / GameRenderer.TILE_SIZE);
-        int v = (int) ((character.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+        Creature creature = playerCreature;
+        int u = (int) ((creature.body.position.x) / GameRenderer.TILE_SIZE);
+        int v = (int) ((creature.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
         gameMap.setTile(u, v, type);
     }

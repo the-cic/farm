@@ -25,13 +25,13 @@ public class GameInteractionsLogic {
     }
 
     public void onEvent(InteractionEvent.BodyOnBody event) {
-        System.out.println("interaction by c.id:" + event.characterId
+        System.out.println("interaction by c.id:" + event.creatureId
                 + " with tool.type:" + event.toolType
                 + " on target.type:" + event.targetType);
     }
 
     public void onEvent(InteractionEvent.BodyOnMapObject event) {
-        System.out.println("interaction by c.id:" + event.characterId
+        System.out.println("interaction by c.id:" + event.creatureId
                 + " with tool.type:" + event.toolType
                 + " on target.type:" + event.targetType);
 

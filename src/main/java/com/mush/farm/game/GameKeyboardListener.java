@@ -84,7 +84,7 @@ public class GameKeyboardListener implements KeyListener {
                 control.togglePause();
                 break;
             case KeyEvent.VK_T:
-                control.changeCharacter();
+                control.changeCreature();
                 break;
         }
 

@@ -7,7 +7,7 @@ package com.mush.farm.game;
 
 import com.mush.farm.game.events.ControlEvent;
 import com.mush.farm.game.events.GenericGameEvent;
-import com.mush.farm.game.model.MovableCharacter;
+import com.mush.farm.game.model.Creature;
 
 /**
  *
@@ -35,8 +35,8 @@ public class GameControl {
         game.eventQueue.add(new ControlEvent(ControlEvent.Action.PAUSE));
     }
 
-    void changeCharacter() {
-        game.eventQueue.add(new ControlEvent(ControlEvent.Action.CHANGE_CHARACTER));
+    void changeCreature() {
+        game.eventQueue.add(new ControlEvent(ControlEvent.Action.CHANGE_CREATURE));
     }
 
     public void applyJoystick() {
@@ -46,35 +46,35 @@ public class GameControl {
     }
 
     public void actionPlayerInteract() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             player.sendInteract();
         }
     }
 
     public void actionPlayerGive() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             player.sendGive();
         }
     }
 
     public void actionPlayerPickUp() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             player.sendPickUp();
         }
     }
 
     public void actionPlayerDrop() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             player.sendDrop();
         }
     }
 
     public void actionPlayerEquip() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             if (player.getEquipped() == null) {
                 player.sendEquipLast();
@@ -85,7 +85,7 @@ public class GameControl {
     }
     
     public void actionCycleInventory() {
-        MovableCharacter player = game.getPlayer();
+        Creature player = game.getPlayer();
         if (player != null) {
             player.sendCycleInventory();
         }

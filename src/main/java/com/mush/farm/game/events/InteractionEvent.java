@@ -10,7 +10,7 @@ import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.MapObject;
 import com.mush.farm.game.model.MapObjectType;
-import com.mush.farm.game.model.MovableCharacter;
+import com.mush.farm.game.model.Creature;
 
 /**
  *
@@ -18,10 +18,10 @@ import com.mush.farm.game.model.MovableCharacter;
  */
 public class InteractionEvent extends GameEvent {
     
-    public final int characterId;
+    public final int creatureId;
     
-    private InteractionEvent(int characterId) {
-        this.characterId = characterId;
+    private InteractionEvent(int creatureId) {
+        this.creatureId = creatureId;
     }
     
     public static class BodyOnBody extends InteractionEvent {
@@ -31,8 +31,8 @@ public class InteractionEvent extends GameEvent {
         public final BodyType toolType;
         public final BodyType targetType;
         
-        public BodyOnBody(MovableCharacter character, Body toolBody, Body targetBody) {
-            super(character.characterId);
+        public BodyOnBody(Creature creature, Body toolBody, Body targetBody) {
+            super(creature.creatureId);
             this.toolId = toolBody.bodyId;
             this.toolType = toolBody.type;
             this.targetId = targetBody.bodyId;
@@ -48,8 +48,8 @@ public class InteractionEvent extends GameEvent {
         public final int targetU;
         public final int targetV;
         
-        public BodyOnMapObject(MovableCharacter character, Body toolBody, MapObject targetMapObject) {
-            super(character.characterId);
+        public BodyOnMapObject(Creature creature, Body toolBody, MapObject targetMapObject) {
+            super(creature.creatureId);
             this.toolId = toolBody.bodyId;
             this.toolType = toolBody.type;
             this.targetType = targetMapObject.type;

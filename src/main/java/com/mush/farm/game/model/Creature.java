@@ -6,7 +6,7 @@
 package com.mush.farm.game.model;
 
 import com.mush.farm.game.GameEventQueue;
-import com.mush.farm.game.events.CharacterEvent;
+import com.mush.farm.game.events.CreatureEvent;
 import java.awt.geom.Point2D;
 import java.util.List;
 
@@ -15,9 +15,9 @@ import java.util.List;
  *
  * @author mush
  */
-public class MovableCharacter {
+public class Creature {
 
-    public final int characterId;
+    public final int creatureId;
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
@@ -25,12 +25,12 @@ public class MovableCharacter {
 
     private Body equippedBody;
 
-    public MovableCharacter(int id, Body body, GameEventQueue queue) {
-        this.characterId = id;
+    public Creature(int id, Body body, GameEventQueue queue) {
+        this.creatureId = id;
         this.body = body;
         this.movementSpeed = 50;
         this.eventQueue = queue;
-        this.body.character = this;
+        this.body.creature = this;
     }
 
     public void move(int dx, int dy) {
@@ -49,38 +49,38 @@ public class MovableCharacter {
     }
 
     public void sendInteract() {
-        eventQueue.add(new CharacterEvent.Interact(this));
+        eventQueue.add(new CreatureEvent.Interact(this));
     }
 
     public void sendGive() {
-        eventQueue.add(new CharacterEvent.Give(this));
+        eventQueue.add(new CreatureEvent.Give(this));
     }
 
     public void sendPickUp() {
-        eventQueue.add(new CharacterEvent.PickUp(this));
+        eventQueue.add(new CreatureEvent.PickUp(this));
     }
 
     public void sendDrop() {
-        eventQueue.add(new CharacterEvent.Drop(this));
+        eventQueue.add(new CreatureEvent.Drop(this));
     }
 
     public void sendEquip(int index) {
-        eventQueue.add(new CharacterEvent.Equip(this, index));
+        eventQueue.add(new CreatureEvent.Equip(this, index));
     }
     
     public void sendEquipLast() {
         int lastIndex = getInventory().size() - 1;
         if (lastIndex >= 0) {
-            eventQueue.add(new CharacterEvent.Equip(this, lastIndex));
+            eventQueue.add(new CreatureEvent.Equip(this, lastIndex));
         }
     }
     
     public void sendUnequip() {
-        eventQueue.add(new CharacterEvent.Unequip(this));
+        eventQueue.add(new CreatureEvent.Unequip(this));
     }
     
     public void sendCycleInventory() {
-        eventQueue.add(new CharacterEvent.CycleInventory(this));
+        eventQueue.add(new CreatureEvent.CycleInventory(this));
     }
 
     public void cycleInventory() {

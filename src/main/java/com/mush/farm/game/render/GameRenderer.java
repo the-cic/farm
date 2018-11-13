@@ -136,8 +136,8 @@ public class GameRenderer {
                 (int) body.position.y,
                 null);
 
-        if (body.character != null) {
-            Body equippedBody = body.character.getEquipped();
+        if (body.creature != null) {
+            Body equippedBody = body.creature.getEquipped();
             if (equippedBody != null) {
                 g.drawImage(bodySpriteMap.get(equippedBody.type),
                         (int) body.position.x,

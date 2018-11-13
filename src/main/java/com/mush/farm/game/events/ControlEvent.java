@@ -17,7 +17,7 @@ public class ControlEvent extends GameEvent {
         PAUSE,
         TOGGLE_STATS,
         APPLY_JOYSTICK,
-        CHANGE_CHARACTER
+        CHANGE_CREATURE
     }
     
     public final Action action;

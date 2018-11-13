@@ -35,9 +35,9 @@ public class GameBodies {
     }
 
     public synchronized boolean unspawn(int id) {
-        Body character = bodyMap.remove(id);
-        if (character != null) {
-            bodies.remove(character);
+        Body body = bodyMap.remove(id);
+        if (body != null) {
+            bodies.remove(body);
             return true;
         }
         return false;
