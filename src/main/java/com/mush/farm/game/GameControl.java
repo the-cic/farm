@@ -24,24 +24,24 @@ public class GameControl {
     }
 
     public void debugEvent(String name, Object payload) {
-        game.eventQueue.add(new GenericGameEvent(name, payload));
+        GameEventQueue.send(new GenericGameEvent(name, payload));
     }
 
     void toggleShowStats() {
-        game.eventQueue.add(new ControlEvent(ControlEvent.Action.TOGGLE_STATS));
+        GameEventQueue.send(new ControlEvent(ControlEvent.Action.TOGGLE_STATS));
     }
 
     void togglePause() {
-        game.eventQueue.add(new ControlEvent(ControlEvent.Action.PAUSE));
+        GameEventQueue.send(new ControlEvent(ControlEvent.Action.PAUSE));
     }
 
     void changeCreature() {
-        game.eventQueue.add(new ControlEvent(ControlEvent.Action.CHANGE_CREATURE));
+        GameEventQueue.send(new ControlEvent(ControlEvent.Action.CHANGE_CREATURE));
     }
 
     public void applyJoystick() {
         if (joystick.isModified()) {
-            game.eventQueue.add(new ControlEvent(ControlEvent.Action.APPLY_JOYSTICK));
+            GameEventQueue.send(new ControlEvent(ControlEvent.Action.APPLY_JOYSTICK));
         }
     }
 

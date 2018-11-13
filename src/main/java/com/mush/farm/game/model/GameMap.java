@@ -5,7 +5,6 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.BodyEvent;
 import com.mush.farm.game.events.MapEvent;
 import com.mush.farm.game.render.GameRenderer;
@@ -23,11 +22,9 @@ public class GameMap {
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
     private double totalElapsedSeconds = 0;
-    private final GameEventQueue eventQueue;
     private final GameBodies bodies;
 
-    public GameMap(GameBodies bodies, GameEventQueue eventQueue) {
-        this.eventQueue = eventQueue;
+    public GameMap(GameBodies bodies) {
         this.bodies = bodies;
         createMap();
     }
@@ -45,7 +42,7 @@ public class GameMap {
 
     private void update() {
         for (int i = 0; i < mapObjects.length; i++) {
-            mapObjects[i].update(totalElapsedSeconds, waterMap[i], eventQueue);
+            mapObjects[i].update(totalElapsedSeconds, waterMap[i]);
         }
         for (int i = 0; i < MAP_WIDTH; i++) {
             for (int j = 0; j < MAP_HEIGHT; j++) {

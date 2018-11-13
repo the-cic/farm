@@ -19,30 +19,52 @@ import java.util.Map;
  */
 public class GameEventQueue {
 
+    private static GameEventQueue instance;
+    
     private List<Object> listeners;
     private LinkedList<GameEvent> queue;
     private Map<Class<?>, Map<Class<?>, Method>> listenerEventMethodMap;
 
-    public GameEventQueue() {
+    static {
+        instance = new GameEventQueue();
+    }
+    
+    private GameEventQueue() {
         listeners = new ArrayList<>();
         listenerEventMethodMap = new HashMap<>();
         queue = new LinkedList<>();
     }
 
-    public void add(GameEvent event) {
+    public static void send(GameEvent event) {
+        instance.sendEvent(event);
+    }
+    
+    public static void addListener(Object listener) {
+        instance.addEventListener(listener);
+    }
+
+    public static void removeListener(Object listener) {
+        instance.removeEventListener(listener);
+    }
+    
+    public static void processQueue() {
+        instance.process();
+    }
+    
+    private void sendEvent(GameEvent event) {
         queue.add(event);
     }
 
-    public void addListener(Object listener) {
+    private void addEventListener(Object listener) {
         listeners.add(listener);
         collectOnEventMethods(listener);
     }
 
-    public void removeListener(Object listener) {
+    private void removeEventListener(Object listener) {
         listeners.remove(listener);
     }
 
-    public void process() {
+    private void process() {
         try {
             while (!queue.isEmpty()) {
                 GameEvent event = queue.removeFirst();

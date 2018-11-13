@@ -17,11 +17,9 @@ import com.mush.farm.game.model.MapObjectType;
 public class GameInteractionsLogic {
 
     private Game game;
-    private GameEventQueue eventQueue;
 
-    public GameInteractionsLogic(Game game, GameEventQueue eventQueue) {
+    public GameInteractionsLogic(Game game) {
         this.game = game;
-        this.eventQueue = eventQueue;
     }
 
     public void onEvent(InteractionEvent.BodyOnBody event) {
@@ -51,13 +49,13 @@ public class GameInteractionsLogic {
     private void bucketFullOnTile(InteractionEvent.BodyOnMapObject event) {
         if (event.targetType == MapObjectType.DIRT_HOLE) {
             game.gameMap.setTile(event.targetU, event.targetV, MapObjectType.WATER);
-            eventQueue.add(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_EMPTY));
+            GameEventQueue.send(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_EMPTY));
         }
     }
 
     private void bucketEmptyOnTile(InteractionEvent.BodyOnMapObject event) {
         if (event.targetType == MapObjectType.WATER) {
-            eventQueue.add(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_FULL));
+            GameEventQueue.send(new BodyEvent.ChangeType(event.toolId, BodyType.BUCKET_FULL));
         }
     }
     

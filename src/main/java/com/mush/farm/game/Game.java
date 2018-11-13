@@ -31,7 +31,7 @@ public class Game {
     public GameRenderer renderer;
     public GameMap gameMap;
     public GameKeyboardListener keyboardListener;
-    public GameEventQueue eventQueue;
+//    public GameEventQueue eventQueue;
     public GameBodies bodies;
     public GameCreatures creatures;
     private GameInteractionsLogic interactionsLogic;
@@ -41,18 +41,18 @@ public class Game {
     private boolean paused = false;
 
     public Game() {
-        eventQueue = new GameEventQueue();
+//        eventQueue = new GameEventQueue();
         control = new GameControl(this);
         bodies = new GameBodies();
-        creatures = new GameCreatures(bodies, eventQueue);
-        gameMap = new GameMap(bodies, eventQueue);
+        creatures = new GameCreatures(bodies);
+        gameMap = new GameMap(bodies);
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
-        interactionsLogic = new GameInteractionsLogic(this, eventQueue);
+        interactionsLogic = new GameInteractionsLogic(this);
 
-        eventQueue.addListener(this);
-        eventQueue.addListener(gameMap);
-        eventQueue.addListener(interactionsLogic);
+        GameEventQueue.addListener(this);
+        GameEventQueue.addListener(gameMap);
+        GameEventQueue.addListener(interactionsLogic);
 
         showStats = false;
 
@@ -76,7 +76,7 @@ public class Game {
     }
 
     public void update(double elapsedSeconds) {
-        eventQueue.process();
+        GameEventQueue.processQueue();
 
         double seconds = paused ? 0 : elapsedSeconds;
 
@@ -140,13 +140,13 @@ public class Game {
 
         if (tool != null) {
             if (nearest != null) {
-                eventQueue.add(new InteractionEvent.BodyOnBody(creature, tool, nearest));
+                GameEventQueue.send(new InteractionEvent.BodyOnBody(creature, tool, nearest));
             }
             int u = (int) ((playerCreature.body.position.x) / GameRenderer.TILE_SIZE);
             int v = (int) ((playerCreature.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
             MapObject mapObject = gameMap.getMapObject(u, v);
-            eventQueue.add(new InteractionEvent.BodyOnMapObject(creature, tool, mapObject));
+            GameEventQueue.send(new InteractionEvent.BodyOnMapObject(creature, tool, mapObject));
         }
     }
 

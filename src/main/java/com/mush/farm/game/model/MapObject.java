@@ -41,7 +41,7 @@ public class MapObject {
         decayRateMultiplier = 0.9 + Math.random() * 0.2;
     }
 
-    public void update(double time, MapWater mapWater, GameEventQueue eventQueue) {
+    public void update(double time, MapWater mapWater) {
         age += time;
 
         if (type == MapObjectType.WATER) {
@@ -56,8 +56,8 @@ public class MapObject {
         if (integrity < 0) {
             decay();
         } else if (age > maxAge) {
-            spread(eventQueue);
-            spawn(eventQueue);
+            spread();
+            spawn();
             evolve();
         }
     }
@@ -67,17 +67,17 @@ public class MapObject {
         reset(newType);
     }
 
-    public void spread(GameEventQueue eventQueue) {
+    public void spread() {
         MapObjectType spreadType = MapObjectType.spread(type);
         if (spreadType != null) {
-            eventQueue.add(new MapEvent.Spread(u, v, spreadType));
+            GameEventQueue.send(new MapEvent.Spread(u, v, spreadType));
         }
     }
 
-    public void spawn(GameEventQueue eventQueue) {
+    public void spawn() {
         BodyType bodyType = MapObjectType.spawn(type);
         if (bodyType != null) {
-            eventQueue.add(new MapEvent.SpawnOnTile(u, v, bodyType));
+            GameEventQueue.send(new MapEvent.SpawnOnTile(u, v, bodyType));
         }
     }
 

@@ -21,15 +21,13 @@ public class Creature {
     public final Body body;
     public final Point2D.Double velocity = new Point2D.Double(0, 0);
     private final double movementSpeed;
-    private final GameEventQueue eventQueue;
 
     private Body equippedBody;
 
-    public Creature(int id, Body body, GameEventQueue queue) {
+    public Creature(int id, Body body) {
         this.creatureId = id;
         this.body = body;
         this.movementSpeed = 50;
-        this.eventQueue = queue;
         this.body.creature = this;
     }
 
@@ -49,38 +47,38 @@ public class Creature {
     }
 
     public void sendInteract() {
-        eventQueue.add(new CreatureEvent.Interact(this));
+        GameEventQueue.send(new CreatureEvent.Interact(this));
     }
 
     public void sendGive() {
-        eventQueue.add(new CreatureEvent.Give(this));
+        GameEventQueue.send(new CreatureEvent.Give(this));
     }
 
     public void sendPickUp() {
-        eventQueue.add(new CreatureEvent.PickUp(this));
+        GameEventQueue.send(new CreatureEvent.PickUp(this));
     }
 
     public void sendDrop() {
-        eventQueue.add(new CreatureEvent.Drop(this));
+        GameEventQueue.send(new CreatureEvent.Drop(this));
     }
 
     public void sendEquip(int index) {
-        eventQueue.add(new CreatureEvent.Equip(this, index));
+        GameEventQueue.send(new CreatureEvent.Equip(this, index));
     }
     
     public void sendEquipLast() {
         int lastIndex = getInventory().size() - 1;
         if (lastIndex >= 0) {
-            eventQueue.add(new CreatureEvent.Equip(this, lastIndex));
+            GameEventQueue.send(new CreatureEvent.Equip(this, lastIndex));
         }
     }
     
     public void sendUnequip() {
-        eventQueue.add(new CreatureEvent.Unequip(this));
+        GameEventQueue.send(new CreatureEvent.Unequip(this));
     }
     
     public void sendCycleInventory() {
-        eventQueue.add(new CreatureEvent.CycleInventory(this));
+        GameEventQueue.send(new CreatureEvent.CycleInventory(this));
     }
 
     public void cycleInventory() {

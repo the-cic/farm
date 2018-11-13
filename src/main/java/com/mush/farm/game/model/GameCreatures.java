@@ -5,7 +5,6 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.GameEventQueue;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,14 +17,12 @@ import java.util.Map;
 public class GameCreatures {
 
     private GameBodies gameBodies;
-    private GameEventQueue eventQueue;
     private List<Creature> creatures;
     private Map<Integer, Creature> creatureMap;
     private int nextCreatureId = 0;
 
-    public GameCreatures(GameBodies gameBodies, GameEventQueue queue) {
+    public GameCreatures(GameBodies gameBodies) {
         this.gameBodies = gameBodies;
-        this.eventQueue = queue;
         this.creatures = new LinkedList<>();
         this.creatureMap = new HashMap<>();
     }
@@ -50,8 +47,7 @@ public class GameCreatures {
 
         Creature creature = new Creature(
                 creatureId,
-                gameBodies.spawnBody(bodyType, x, y),
-                eventQueue);
+                gameBodies.spawnBody(bodyType, x, y));
 
         creatures.add(creature);
         creatureMap.put(creatureId, creature);
