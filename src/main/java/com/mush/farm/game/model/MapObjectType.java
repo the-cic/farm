@@ -26,6 +26,7 @@ public enum MapObjectType {
     POTATO_SAPLING,
     POTATO_PLANT,
     STONE_WALL,
+    STONE_WALL_TOP,
 //    WOOD_WALL
     ;
 

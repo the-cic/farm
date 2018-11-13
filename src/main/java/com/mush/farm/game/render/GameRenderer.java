@@ -34,13 +34,18 @@ public class GameRenderer {
     public static final int TILE_SIZE = 16;
     public static final int TILE_ZOOM = 2;
 
+    // For now same as map
+    public static final int VIEW_WIDTH = GameMap.MAP_WIDTH;
+    public static final int VIEW_HEIGHT = GameMap.MAP_HEIGHT;
+
     private Game game;
     private GameMap gameMap;
     private BufferedImage tilesImage = null;
     private BufferedImage spritesImage = null;
     private Map<MapObjectType, BufferedImage> tileMap;
     private Map<BodyType, BufferedImage> bodySpriteMap;
-    private final BodyDrawComparator bodyComparator;
+    private final BodyDrawComparator bodyDrawComparator;
+    private List<Body>[] bodiesByLine;
 
     public GameRenderer(Game game) {
         this.game = game;
@@ -48,7 +53,11 @@ public class GameRenderer {
 
         tileMap = new HashMap<>();
         bodySpriteMap = new HashMap<>();
-        bodyComparator = new BodyDrawComparator();
+        bodyDrawComparator = new BodyDrawComparator();
+        bodiesByLine = new List[VIEW_HEIGHT];
+        for (int i = 0; i < bodiesByLine.length; i++) {
+            bodiesByLine[i] = new ArrayList<>();
+        }
 
         try {
             tilesImage = ImageIO.read(new File("img/tiles.png"));
@@ -60,7 +69,8 @@ public class GameRenderer {
             cutTile(tilesImage, 3, 0, MapObjectType.DIRT_HOLE);
             cutTile(tilesImage, 0, 1, MapObjectType.ORGANIC_RUBBLE);
             cutTile(tilesImage, 1, 1, MapObjectType.STONE_RUBBLE);
-            cutTile(tilesImage, 2, 1, MapObjectType.STONE_WALL);
+            cutTile(tilesImage, 4, 1, MapObjectType.STONE_WALL);
+            cutTile(tilesImage, 4, 0, MapObjectType.STONE_WALL_TOP);
             cutTile(tilesImage, 0, 2, MapObjectType.POTATO_PLANTED);
             cutTile(tilesImage, 1, 2, MapObjectType.POTATO_SAPLING);
             cutTile(tilesImage, 2, 2, MapObjectType.POTATO_PLANT);
@@ -93,29 +103,78 @@ public class GameRenderer {
         AffineTransform t = g.getTransform();
         g.scale(TILE_ZOOM, TILE_ZOOM);
 
-        for (int j = 0; j < 50; j++) {
-            for (int i = 0; i < 50; i++) {
+        for (int j = 0; j < VIEW_WIDTH; j++) {
+            for (int i = 0; i < VIEW_HEIGHT; i++) {
                 MapObject object = gameMap.getMapObject(i, j);
-                MapWater water = gameMap.getWaterObject(i, j);
-                if (object != null /*&& object.type != null*/) {
-                    render(g, i, j, object, water);
+                if (object != null) {
+                    render(g, i, j, object);
+
+                    if (game.getShowStats()) {
+                        MapWater water = gameMap.getWaterObject(i, j);
+                        renderStats(g, i, j, object, water);
+                    }
                 }
             }
         }
 
-        List<Body> depthSortedBodies = depthSortBodies(game.bodies.getBodies());
+        splitBodiesIntoLines(game.bodies.getBodies());
+        depthSortBodiesInLines();
 
-        for (Body body : depthSortedBodies) {
-            render(g, body);
+//        List<Body> depthSortedBodies = depthSortBodies(game.bodies.getBodies());
+        for (int j = 0; j < bodiesByLine.length; j++) {
+//            for (int i = 0; i < VIEW_HEIGHT; i++) {
+//                MapObject object = gameMap.getMapObject(i, j);
+//                if (object != null && object.type == MapObjectType.STONE_WALL) {
+//                    BufferedImage tile = tileMap.get(MapObjectType.STONE_WALL_TOP);
+//                    int x = i * TILE_SIZE;
+//                    int y = j * TILE_SIZE;
+//                    if (tile != null) {
+//                        g.drawImage(tile, x, y - TILE_SIZE, null);
+//                    }
+////                    tile = tileMap.get(MapObjectType.STONE_WALL);
+////                    if (tile != null) {
+////                        g.drawImage(tile, x, y, null);
+////                    }
+//                }
+//            }
+            for (Body body : bodiesByLine[j]) {
+                render(g, body);
+            }
         }
 
+//        for (Body body : depthSortedBodies) {
+//            render(g, body);
+//        }
         g.setTransform(t);
+
+        clearBodyLines();
+    }
+
+    private void splitBodiesIntoLines(List<Body> allBodies) {
+        for (Body body : allBodies) {
+            int v = (int) (body.position.y / TILE_SIZE);
+            if (v >= 0 && v < bodiesByLine.length) {
+                bodiesByLine[v].add(body);
+            }
+        }
+    }
+
+    private void clearBodyLines() {
+        for (List<Body> lineList : bodiesByLine) {
+            lineList.clear();
+        }
+    }
+
+    private void depthSortBodiesInLines() {
+        for (int v = 0; v < bodiesByLine.length; v++) {
+            Collections.sort(bodiesByLine[v], bodyDrawComparator);
+        }
     }
 
     private List<Body> depthSortBodies(List<Body> original) {
         List<Body> ordered = new ArrayList<>(original);
 
-        Collections.sort(ordered, bodyComparator);
+        Collections.sort(ordered, bodyDrawComparator);
 
         return ordered;
     }
@@ -147,34 +206,35 @@ public class GameRenderer {
         }
     }
 
-    private void render(Graphics2D g, int u, int v, MapObject object, MapWater water) {
+    private void render(Graphics2D g, int u, int v, MapObject object) {
         BufferedImage tile = tileMap.get(object.type);
         int x = u * TILE_SIZE;
         int y = v * TILE_SIZE;
         if (tile != null) {
             g.drawImage(tile, x, y, null);
         }
+    }
 
-        if (game.getShowStats()) {
-            /**/
-            g.setColor(Color.BLUE);
-            int waterLenght = (int) (water.getValue() * (TILE_SIZE - 2));
-            g.drawLine(x + 1, y + 3, x + 1 + waterLenght, y + 3);
+    private void renderStats(Graphics2D g, int u, int v, MapObject object, MapWater water) {
+        int x = u * TILE_SIZE;
+        int y = v * TILE_SIZE;
 
-            g.setColor(new Color(0, 0.2f, 1, 0.2f));
-            if (water.getValue() > 0) {
-//                g.drawRect(x + 1, y + 1, tileSize - 2, tileSize - 2);
-                g.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
-            }
-            /**/
-            g.setColor(Color.YELLOW);
-            int ageLength = (int) (object.getAgePercent() * (TILE_SIZE - 2));
-            g.drawLine(x + 1, y + 1, x + 1 + ageLength, y + 1);
+        g.setColor(Color.BLUE);
+        int waterLenght = (int) (water.getValue() * (TILE_SIZE - 2));
+        g.drawLine(x + 1, y + 3, x + 1 + waterLenght, y + 3);
 
-            g.setColor(Color.RED);
-            int healthLength = (int) (object.integrity * (TILE_SIZE - 2));
-            g.drawLine(x + 1, y + 2, x + 1 + healthLength, y + 2);
+        g.setColor(new Color(0, 0.2f, 1, 0.2f));
+        if (water.getValue() > 0) {
+            g.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
         }
+
+        g.setColor(Color.YELLOW);
+        int ageLength = (int) (object.getAgePercent() * (TILE_SIZE - 2));
+        g.drawLine(x + 1, y + 1, x + 1 + ageLength, y + 1);
+
+        g.setColor(Color.RED);
+        int healthLength = (int) (object.integrity * (TILE_SIZE - 2));
+        g.drawLine(x + 1, y + 2, x + 1 + healthLength, y + 2);
     }
 
 }

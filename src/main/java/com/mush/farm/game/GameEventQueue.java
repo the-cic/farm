@@ -21,7 +21,7 @@ import java.util.Map;
 public class GameEventQueue {
 
     private static GameEventQueue instance;
-    
+
     private List<Object> listeners;
     private LinkedList<GameEvent> queue;
     private Map<Class<?>, Map<Class<?>, Method>> listenerEventMethodMap;
@@ -29,7 +29,7 @@ public class GameEventQueue {
     static {
         instance = new GameEventQueue();
     }
-    
+
     private GameEventQueue() {
         listeners = new ArrayList<>();
         listenerEventMethodMap = new HashMap<>();
@@ -39,7 +39,7 @@ public class GameEventQueue {
     public static void send(GameEvent event) {
         instance.sendEvent(event);
     }
-    
+
     public static void addListener(Object listener) {
         instance.addEventListener(listener);
     }
@@ -47,11 +47,11 @@ public class GameEventQueue {
     public static void removeListener(Object listener) {
         instance.removeEventListener(listener);
     }
-    
+
     public static void processQueue() {
         instance.process();
     }
-    
+
     private void sendEvent(GameEvent event) {
         queue.add(event);
     }
@@ -67,10 +67,14 @@ public class GameEventQueue {
 
     private void process() {
         try {
-            while (!queue.isEmpty()) {
-                GameEvent event = queue.removeFirst();
+            LinkedList<GameEvent> oldQueue = (LinkedList<GameEvent>) queue.clone();
+            queue.clear();
+
+            for (GameEvent event : oldQueue) {
                 process(event);
             }
+            oldQueue.clear();
+
         } catch (Exception e) {
             e.printStackTrace(System.out);
         }
