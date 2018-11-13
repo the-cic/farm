@@ -5,10 +5,11 @@
  */
 package com.mush.farm.game;
 
-import com.mush.farm.game.events.CreatureEvent;
+import com.mush.farm.game.logic.GameInteractionsLogic;
 import com.mush.farm.game.events.ControlEvent;
 import com.mush.farm.game.events.GenericGameEvent;
-import com.mush.farm.game.events.InteractionEvent;
+import com.mush.farm.game.logic.GameEventLogic;
+import com.mush.farm.game.logic.GameMapEventLogic;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
@@ -17,7 +18,6 @@ import com.mush.farm.game.model.GameCreatures;
 import com.mush.farm.game.model.Creature;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.GameMapGenerator;
-import com.mush.farm.game.model.MapObject;
 import com.mush.farm.game.model.MapObjectType;
 import java.util.List;
 
@@ -33,6 +33,9 @@ public class Game {
     public GameKeyboardListener keyboardListener;
     public GameBodies bodies;
     public GameCreatures creatures;
+    
+    private GameEventLogic gameEventLogic;
+    private GameMapEventLogic gameMapLogic;
     private GameInteractionsLogic interactionsLogic;
 
     private Creature playerCreature;
@@ -43,13 +46,18 @@ public class Game {
         control = new GameControl(this);
         bodies = new GameBodies();
         creatures = new GameCreatures(bodies);
-        gameMap = new GameMap(bodies);
+        gameMap = new GameMap();
         renderer = new GameRenderer(this);
         keyboardListener = new GameKeyboardListener(control);
+        
+        gameEventLogic = new GameEventLogic(this);
+        gameMapLogic = new GameMapEventLogic(gameMap, bodies);
         interactionsLogic = new GameInteractionsLogic(this);
 
         GameEventQueue.addListener(this);
-        GameEventQueue.addListener(gameMap);
+        GameEventQueue.addListener(gameEventLogic);
+//        GameEventQueue.addListener(gameMap);//
+        GameEventQueue.addListener(gameMapLogic);
         GameEventQueue.addListener(interactionsLogic);
 
         showStats = false;
@@ -127,50 +135,6 @@ public class Game {
         }
     }
 
-    public void onEvent(CreatureEvent.Interact event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-
-        Body nearest = getClosestBodyTo(creature.body, 1);
-        Body tool = creature.getEquipped();
-
-        if (tool != null) {
-            if (nearest != null) {
-                GameEventQueue.send(new InteractionEvent.BodyOnBody(creature, tool, nearest));
-            }
-            int u = (int) ((playerCreature.body.position.x) / GameRenderer.TILE_SIZE);
-            int v = (int) ((playerCreature.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
-
-            MapObject mapObject = gameMap.getMapObject(u, v);
-            GameEventQueue.send(new InteractionEvent.BodyOnMapObject(creature, tool, mapObject));
-        }
-    }
-
-    public void onEvent(CreatureEvent.Give event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-
-        if (creature.hasEquipped()) {
-            Body nearest = getClosestCreatureBodyTo(creature.body, 2);
-
-            if (nearest != null && nearest.creature != null) {
-                Creature peer = nearest.creature;
-
-                Body item = creature.unequipDirectly();
-
-                if (peer.hasEquipped()) {
-                    peer.addToInventory(item);
-                } else {
-                    peer.equipDirectly(item);
-                }
-            }
-        }
-    }
-
     public Body getClosestCreatureBodyTo(Body body0, double distance) {
         return getClosestBodyTo(body0, true, distance);
     }
@@ -198,65 +162,6 @@ public class Game {
             return nearest;
         }
         return null;
-    }
-
-    public void onEvent(CreatureEvent.PickUp event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-
-        Body nearest = getClosestBodyTo(creature.body, 1);
-
-        if (nearest != null) {
-            bodies.getBodies().remove(nearest);
-            if (creature.hasEquipped()) {
-                creature.addToInventory(nearest);
-            } else {
-                creature.equipDirectly(nearest);
-            }
-        }
-    }
-
-    public void onEvent(CreatureEvent.Drop event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-        Body item = creature.removeLastFromInventory();
-        if (item == null) {
-            item = creature.unequipDirectly();
-        }
-        if (item != null) {
-            item.position.setLocation(creature.body.position);
-            // just a tiny bit in front of the creature
-            item.position.y += 1;
-            bodies.getBodies().add(item);
-        }
-    }
-
-    public void onEvent(CreatureEvent.Equip event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-        creature.equipFromInventory(event.inventoryIndex);
-    }
-
-    public void onEvent(CreatureEvent.Unequip event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-        creature.unequipIntoInventory();
-    }
-
-    public void onEvent(CreatureEvent.CycleInventory event) {
-        Creature creature = creatures.getCreature(event.creatureId);
-        if (creature == null) {
-            return;
-        }
-        creature.cycleInventory();
     }
 
     private void onJoystick() {

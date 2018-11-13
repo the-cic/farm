@@ -5,8 +5,6 @@
  */
 package com.mush.farm.game.events;
 
-import com.mush.farm.game.GameEvent;
-
 /**
  *
  * @author mush

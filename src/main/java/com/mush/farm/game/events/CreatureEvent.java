@@ -5,7 +5,6 @@
  */
 package com.mush.farm.game.events;
 
-import com.mush.farm.game.GameEvent;
 import com.mush.farm.game.model.Creature;
 
 /**

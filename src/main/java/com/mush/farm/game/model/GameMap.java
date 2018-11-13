@@ -5,10 +5,6 @@
  */
 package com.mush.farm.game.model;
 
-import com.mush.farm.game.events.BodyEvent;
-import com.mush.farm.game.events.MapEvent;
-import com.mush.farm.game.render.GameRenderer;
-
 /**
  *
  * @author mush
@@ -22,10 +18,8 @@ public class GameMap {
     private MapObject[] mapObjects;
     private MapWater[] waterMap;
     private double totalElapsedSeconds = 0;
-    private final GameBodies bodies;
 
-    public GameMap(GameBodies bodies) {
-        this.bodies = bodies;
+    public GameMap() {
         createMap();
     }
 
@@ -60,21 +54,6 @@ public class GameMap {
         for (MapWater water : waterMap) {
             water.applyStepsFromSource();
             water.update(totalElapsedSeconds);
-        }
-    }
-
-    public void onEvent(MapEvent.Spread event) {
-        spread(event.u, event.v, event.type);
-    }
-
-    public void onEvent(MapEvent.SpawnOnTile event) {
-        spawnOnTile(event.u, event.v, event.type);
-    }
-
-    public void onEvent(BodyEvent.ChangeType event) {
-        Body body = bodies.getBody(event.bodyId);
-        if (body != null) {
-            body.type = event.type;
         }
     }
 
@@ -125,7 +104,7 @@ public class GameMap {
         }
     }
 
-    private void spread(int u, int v, MapObjectType type) {
+    public void spread(int u, int v, MapObjectType type) {
         int du = 0;
         int dv = 0;
 
@@ -169,12 +148,6 @@ public class GameMap {
             }
         }
         return false;
-    }
-
-    private void spawnOnTile(int u, int v, BodyType type) {
-        int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
-        int y = v * GameRenderer.TILE_SIZE;
-        bodies.spawnBody(type, x, y);
     }
 
     private void propagate(MapWater water, int i, int j) {

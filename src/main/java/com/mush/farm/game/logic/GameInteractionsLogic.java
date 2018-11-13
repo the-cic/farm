@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mush.farm.game;
+package com.mush.farm.game.logic;
 
+import com.mush.farm.game.Game;
+import com.mush.farm.game.GameEventQueue;
 import com.mush.farm.game.events.BodyEvent;
 import com.mush.farm.game.events.InteractionEvent;
 import com.mush.farm.game.model.BodyType;
