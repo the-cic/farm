@@ -31,7 +31,6 @@ public class Game {
     public GameRenderer renderer;
     public GameMap gameMap;
     public GameKeyboardListener keyboardListener;
-//    public GameEventQueue eventQueue;
     public GameBodies bodies;
     public GameCreatures creatures;
     private GameInteractionsLogic interactionsLogic;
@@ -41,7 +40,6 @@ public class Game {
     private boolean paused = false;
 
     public Game() {
-//        eventQueue = new GameEventQueue();
         control = new GameControl(this);
         bodies = new GameBodies();
         creatures = new GameCreatures(bodies);
@@ -212,7 +210,11 @@ public class Game {
 
         if (nearest != null) {
             bodies.getBodies().remove(nearest);
-            creature.addToInventory(nearest);
+            if (creature.hasEquipped()) {
+                creature.addToInventory(nearest);
+            } else {
+                creature.equipDirectly(nearest);
+            }
         }
     }
 
@@ -222,6 +224,9 @@ public class Game {
             return;
         }
         Body item = creature.removeLastFromInventory();
+        if (item == null) {
+            item = creature.unequipDirectly();
+        }
         if (item != null) {
             item.position.setLocation(creature.body.position);
             // just a tiny bit in front of the creature
