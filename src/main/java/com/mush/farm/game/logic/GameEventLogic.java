@@ -12,20 +12,21 @@ import com.mush.farm.game.events.InteractionEvent;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.Creature;
 import com.mush.farm.game.model.MapObject;
-import com.mush.farm.game.render.GameRenderer;
+import com.mush.farm.game.model.MapObjectType;
+import java.awt.Point;
 
 /**
  *
  * @author mush
  */
 public class GameEventLogic {
-    
+
     private final Game game;
-    
+
     public GameEventLogic(Game game) {
         this.game = game;
     }
- 
+
     public void onEvent(CreatureEvent.Interact event) {
         Creature creature = game.creatures.getCreature(event.creatureId);
         if (creature == null) {
@@ -39,10 +40,10 @@ public class GameEventLogic {
             if (nearest != null) {
                 GameEventQueue.send(new InteractionEvent.BodyOnBody(creature, tool, nearest));
             }
-            int u = (int) ((game.getPlayer().body.position.x) / GameRenderer.TILE_SIZE);
-            int v = (int) ((game.getPlayer().body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
 
-            MapObject mapObject = game.gameMap.getMapObject(u, v);
+            Point mapPoint = GameSizes.getTileCoordinates(game.getPlayer().body.position);
+
+            MapObject mapObject = game.gameMap.getMapObject(mapPoint.x, mapPoint.y);
             GameEventQueue.send(new InteractionEvent.BodyOnMapObject(creature, tool, mapObject));
         }
     }
@@ -69,7 +70,7 @@ public class GameEventLogic {
             }
         }
     }
-    
+
     public void onEvent(CreatureEvent.PickUp event) {
         Creature creature = game.creatures.getCreature(event.creatureId);
         if (creature == null) {
@@ -100,7 +101,7 @@ public class GameEventLogic {
         if (item != null) {
             item.position.setLocation(creature.body.position);
             // just a tiny bit in front of the creature
-            item.position.y += 1;
+            item.position.y += GameSizes.TILE_SIZE / 4;
             game.bodies.getBodies().add(item);
         }
     }
@@ -128,6 +129,17 @@ public class GameEventLogic {
         }
         creature.cycleInventory();
     }
-    
-    
+
+    public void onEvent(CreatureEvent.BodyCollision event) {
+        Creature creature = game.creatures.getCreature(event.creatureId);
+        Body body = game.bodies.getBody(event.bodyId);
+//        System.out.println("Collision YO! " + creature.body.type + " with " + body.type);
+    }
+
+    public void onEvent(CreatureEvent.MapCollision event) {
+        Creature creature = game.creatures.getCreature(event.creatureId);
+        MapObjectType type = event.type;
+//        System.out.println("Collision YO! " + creature.body.type + " with " + type);
+    }
+
 }

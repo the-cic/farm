@@ -6,6 +6,7 @@
 package com.mush.farm.game.render;
 
 import com.mush.farm.game.Game;
+import static com.mush.farm.game.logic.GameSizes.TILE_SIZE;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.GameMap;
@@ -31,7 +32,6 @@ import javax.imageio.ImageIO;
  */
 public class GameRenderer {
 
-    public static final int TILE_SIZE = 16;
     public static final int TILE_ZOOM = 2;
 
     // For now same as map

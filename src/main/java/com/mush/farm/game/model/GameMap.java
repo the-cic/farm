@@ -13,6 +13,7 @@ public class GameMap {
 
     public static final int MAP_WIDTH = 25;
     public static final int MAP_HEIGHT = 25;
+    
     private final double maxElapsedSeconds = 0.5;
 
     private MapObject[] mapObjects;

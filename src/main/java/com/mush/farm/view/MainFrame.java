@@ -6,6 +6,7 @@
 package com.mush.farm.view;
 
 import com.mush.farm.game.Game;
+import com.mush.farm.game.logic.GameSizes;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.render.GameRenderer;
 import java.awt.Dimension;
@@ -39,7 +40,7 @@ public class MainFrame extends JFrame {
         panel = new MainPanel(game.renderer);
         panel.setVisible(true);
 
-        int tileSize = GameRenderer.TILE_SIZE * GameRenderer.TILE_ZOOM;
+        int tileSize = GameSizes.TILE_SIZE * GameRenderer.TILE_ZOOM;
 
         panel.setPreferredSize(new Dimension(GameMap.MAP_WIDTH * tileSize, GameMap.MAP_HEIGHT * tileSize));
 

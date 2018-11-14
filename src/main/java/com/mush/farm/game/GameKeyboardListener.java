@@ -47,6 +47,9 @@ public class GameKeyboardListener implements KeyListener {
             case KeyEvent.VK_V:
                 control.toggleShowStats();
                 break;
+            case KeyEvent.VK_C:
+                control.toggleCollisions();
+                break;
             case KeyEvent.VK_1:
                 control.debugEvent("setTile", MapObjectType.DIRT);
                 break;

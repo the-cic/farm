@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -26,8 +27,7 @@ public enum MapObjectType {
     POTATO_SAPLING,
     POTATO_PLANT,
     STONE_WALL,
-    STONE_WALL_TOP,
-//    WOOD_WALL
+    STONE_WALL_TOP, //    WOOD_WALL
     ;
 
     public static final Map<MapObjectType, MapObjectType> decayMap;
@@ -39,6 +39,7 @@ public enum MapObjectType {
     public static final Map<MapObjectType, Double> evolveAgeMap;
     public static final Map<MapObjectType, double[]> waterDecayParamsMap;
     public static final Map<MapObjectType, Boolean> waterBlockingMap;
+    public static final Map<MapObjectType, Boolean> collidableMap;
 
     static {
         decayMap = new HashMap<>();
@@ -51,6 +52,7 @@ public enum MapObjectType {
         spawnOnEvolveMap = new HashMap<>();
         waterDecayParamsMap = new HashMap<>();
         waterBlockingMap = new HashMap<>();
+        collidableMap = new HashMap<>();
 
         setDecay(POTATO_PLANTED, ORGANIC_RUBBLE, 10.0);
         setDecay(POTATO_SAPLING, ORGANIC_RUBBLE, 20.0);
@@ -72,12 +74,14 @@ public enum MapObjectType {
         setWaterDecayMultiplayerParams(POTATO_SAPLING, 1, -1);
         setWaterDecayMultiplayerParams(POTATO_PLANTED, 1, -1);
         setWaterDecayMultiplayerParams(POTATO_PLANT, 1, -1);
-        
+
         setWaterDecayMultiplayerParams(GRASS, 1, -1);
-        
+
         setWaterDecayMultiplayerParams(STONE_WALL, 0, 1);
-        
+
         setBlocksWater(STONE_WALL);
+
+        setCollidable(STONE_WALL);
     }
 
     public static MapObjectType decay(MapObjectType from) {
@@ -89,12 +93,12 @@ public enum MapObjectType {
         MapObjectType result = evolveMap.get(from);
         return result != null ? result : from;
     }
-    
+
     public static MapObjectType spread(MapObjectType from) {
         MapObjectType result = spreadOnEvolveMap.get(from);
         return result;
     }
-    
+
     public static boolean canSpreadInto(MapObjectType type, MapObjectType intoType) {
         Set<MapObjectType> set = canSpreadIntoMap.get(type);
         if (set.isEmpty()) {
@@ -102,7 +106,7 @@ public enum MapObjectType {
         }
         return set.contains(intoType);
     }
-    
+
     public static BodyType spawn(MapObjectType from) {
         return spawnOnEvolveMap.get(from);
     }
@@ -111,10 +115,15 @@ public enum MapObjectType {
         Double rate = decayRateMap.get(type);
         return rate != null ? rate : 0;
     }
-    
+
     public static boolean blocksWater(MapObjectType type) {
         Boolean blocks = waterBlockingMap.get(type);
         return Boolean.TRUE.equals(blocks);
+    }
+    
+    public static boolean isCollidable(MapObjectType type) {
+        Boolean collidable = collidableMap.get(type);
+        return Boolean.TRUE.equals(collidable);
     }
 
     public static double getWaterDecayMultiplier(MapObjectType type, double water) {
@@ -160,12 +169,12 @@ public enum MapObjectType {
         evolveMap.put(evolveFrom, evolveTo);
         evolveAgeMap.put(evolveFrom, evolveAge);
     }
-    
+
     public static void setEvolveAndSpread(MapObjectType evolveFrom, MapObjectType evolveTo, MapObjectType spreadAs, double evolveAge) {
         setEvolve(evolveFrom, evolveTo, evolveAge);
         spreadOnEvolveMap.put(evolveFrom, spreadAs);
     }
-    
+
     public static void setCanSpreadInto(MapObjectType type, MapObjectType spreadInto) {
         Set<MapObjectType> set = canSpreadIntoMap.get(type);
         if (set == null) {
@@ -179,9 +188,13 @@ public enum MapObjectType {
         setEvolve(evolveFrom, evolveTo, evolveAge);
         spawnOnEvolveMap.put(evolveFrom, spawnOne);
     }
-    
+
     private static void setBlocksWater(MapObjectType type) {
         waterBlockingMap.put(type, true);
     }
-    
+
+    private static void setCollidable(MapObjectType type) {
+        collidableMap.put(type, true);
+    }
+
 }

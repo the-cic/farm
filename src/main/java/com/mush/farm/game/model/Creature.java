@@ -31,7 +31,7 @@ public class Creature {
         this.body.creature = this;
     }
 
-    public void move(int dx, int dy) {
+    public void setMovingDirection(int dx, int dy) {
         velocity.x = dx;
         velocity.y = dy;
         if (dx != 0 && dy != 0) {
@@ -42,8 +42,12 @@ public class Creature {
     }
 
     public void update(double elapsedSeconds) {
-        body.position.x += velocity.x * elapsedSeconds * movementSpeed;
-        body.position.y += velocity.y * elapsedSeconds * movementSpeed;
+        double xOffset = velocity.x * elapsedSeconds * movementSpeed;
+        double yOffset = velocity.y * elapsedSeconds * movementSpeed;
+        
+        if (xOffset != 0 || yOffset != 0) {
+            GameEventQueue.send(new CreatureEvent.Move(this, xOffset, yOffset));
+        }
     }
 
     public void sendInteract() {

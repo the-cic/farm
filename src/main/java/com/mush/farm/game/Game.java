@@ -10,6 +10,8 @@ import com.mush.farm.game.events.ControlEvent;
 import com.mush.farm.game.events.GenericGameEvent;
 import com.mush.farm.game.logic.GameEventLogic;
 import com.mush.farm.game.logic.GameMapEventLogic;
+import com.mush.farm.game.logic.GameSizes;
+import com.mush.farm.game.logic.MovementLogic;
 import com.mush.farm.game.render.GameRenderer;
 import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
@@ -19,6 +21,7 @@ import com.mush.farm.game.model.Creature;
 import com.mush.farm.game.model.GameMap;
 import com.mush.farm.game.model.GameMapGenerator;
 import com.mush.farm.game.model.MapObjectType;
+import java.awt.Point;
 import java.util.List;
 
 /**
@@ -37,10 +40,12 @@ public class Game {
     private GameEventLogic gameEventLogic;
     private GameMapEventLogic gameMapLogic;
     private GameInteractionsLogic interactionsLogic;
+    private MovementLogic movementLogic;
 
     private Creature playerCreature;
     private boolean showStats;
     private boolean paused = false;
+    private boolean mapCollisionsEnabled = true;
 
     public Game() {
         control = new GameControl(this);
@@ -53,12 +58,13 @@ public class Game {
         gameEventLogic = new GameEventLogic(this);
         gameMapLogic = new GameMapEventLogic(gameMap, bodies);
         interactionsLogic = new GameInteractionsLogic(this);
+        movementLogic = new MovementLogic(this);
 
         GameEventQueue.addListener(this);
         GameEventQueue.addListener(gameEventLogic);
-//        GameEventQueue.addListener(gameMap);//
         GameEventQueue.addListener(gameMapLogic);
         GameEventQueue.addListener(interactionsLogic);
+        GameEventQueue.addListener(movementLogic);
 
         showStats = false;
 
@@ -109,6 +115,10 @@ public class Game {
     public boolean getShowStats() {
         return showStats;
     }
+    
+    public boolean getMapCollisionsEnabled() {
+        return mapCollisionsEnabled;
+    }
 
     public void onEvent(ControlEvent event) {
         switch (event.action) {
@@ -120,6 +130,9 @@ public class Game {
                 break;
             case TOGGLE_STATS:
                 showStats = !showStats;
+                break;
+            case TOGGLE_COLLISIONS:
+                mapCollisionsEnabled = !mapCollisionsEnabled;
                 break;
             case CHANGE_CREATURE:
                 changeCreature();
@@ -158,22 +171,22 @@ public class Game {
 
             }
         }
-        if (nearest != null && shortest < GameRenderer.TILE_SIZE * distance) {
+        if (nearest != null && shortest < GameSizes.TILE_SIZE * distance) {
             return nearest;
         }
         return null;
     }
 
     private void onJoystick() {
-        playerCreature.move(control.joystick.getXJoystick(), control.joystick.getYJoystick());
+        playerCreature.setMovingDirection(control.joystick.getXJoystick(), control.joystick.getYJoystick());
     }
 
     private void setTileUnderPlayer(MapObjectType type) {
         Creature creature = playerCreature;
-        int u = (int) ((creature.body.position.x) / GameRenderer.TILE_SIZE);
-        int v = (int) ((creature.body.position.y + GameRenderer.TILE_SIZE) / GameRenderer.TILE_SIZE);
+        
+        Point mapPoint = GameSizes.getTileCoordinates(creature.body.position);
 
-        gameMap.setTile(u, v, type);
+        gameMap.setTile(mapPoint.x, mapPoint.y, type);
     }
 
 }

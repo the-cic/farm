@@ -31,6 +31,10 @@ public class GameControl {
         GameEventQueue.send(new ControlEvent(ControlEvent.Action.TOGGLE_STATS));
     }
 
+    void toggleCollisions() {
+        GameEventQueue.send(new ControlEvent(ControlEvent.Action.TOGGLE_COLLISIONS));
+    }
+
     void togglePause() {
         GameEventQueue.send(new ControlEvent(ControlEvent.Action.PAUSE));
     }

@@ -11,7 +11,7 @@ import com.mush.farm.game.model.Body;
 import com.mush.farm.game.model.BodyType;
 import com.mush.farm.game.model.GameBodies;
 import com.mush.farm.game.model.GameMap;
-import com.mush.farm.game.render.GameRenderer;
+import java.awt.Point;
 
 /**
  *
@@ -43,9 +43,8 @@ public class GameMapEventLogic {
     }
 
     private void spawnOnTile(int u, int v, BodyType type) {
-        int x = u * GameRenderer.TILE_SIZE + GameRenderer.TILE_SIZE / 2;
-        int y = v * GameRenderer.TILE_SIZE;
-        bodies.spawnBody(type, x, y);
+        Point point = GameSizes.getTileCenterPosition(u, v);
+        bodies.spawnBody(type, point.x, point.y);
     }
 
 }

@@ -14,6 +14,7 @@ public class ControlEvent extends GameEvent {
     public static enum Action {
         PAUSE,
         TOGGLE_STATS,
+        TOGGLE_COLLISIONS,
         APPLY_JOYSTICK,
         CHANGE_CREATURE
     }
